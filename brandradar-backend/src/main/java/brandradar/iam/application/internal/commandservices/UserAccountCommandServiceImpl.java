@@ -8,6 +8,8 @@ import brandradar.iam.domain.model.repositories.UserAccountRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import brandradar.iam.application.commands.ResetPasswordCommand;
+import brandradar.iam.domain.model.valueobjects.PasswordHash;
 
 import java.util.Optional;
 
@@ -62,5 +64,26 @@ public class UserAccountCommandServiceImpl implements UserAccountCommandService 
         } else {
             System.out.println("Intento de recuperación para correo no registrado: " + command.email());
         }
+    }
+
+    @Override
+    public void handle(ResetPasswordCommand command) {
+        var userAccountOptional = userAccountRepository.findByPasswordRecoveryToken(command.token());
+
+        if (userAccountOptional.isEmpty()) {
+            throw new IllegalArgumentException("Invalid recovery token.");
+        }
+
+        var userAccount = userAccountOptional.get();
+
+        if (userAccount.getTokenExpiryDate().isBefore(java.time.Instant.now())) {
+            throw new IllegalStateException("Recovery token has expired.");
+        }
+
+        var newPasswordHash = new PasswordHash(command.newPassword());
+
+        var updatedUserAccount = userAccount.withUpdatedPassword(newPasswordHash);
+
+        userAccountRepository.save(updatedUserAccount);
     }
 }
