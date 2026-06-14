@@ -18,12 +18,12 @@ public class UserAccount {
     private final Instant updatedAt;
     private final String passwordRecoveryToken;
     private final Instant tokenExpiryDate;
-    private final int sessionVersion;
+    private final Long sessionVersion;
 
     private UserAccount(Long id, Email email, PasswordHash passwordHash,
                         String role, String description, String status,
                         Instant createdAt, Instant updatedAt,
-                        String passwordRecoveryToken, Instant tokenExpiryDate, int sessionVersion) {
+                        String passwordRecoveryToken, Instant tokenExpiryDate, Long sessionVersion) {
         this.id = id;
         this.email = Objects.requireNonNull(email, "Email is required");
         this.passwordHash = Objects.requireNonNull(passwordHash, "Password hash is required");
@@ -39,11 +39,11 @@ public class UserAccount {
 
     public static UserAccount create(Email email, PasswordHash passwordHash, String role, String description) {
         return new UserAccount(null, email, passwordHash, role, description, "PENDING_VERIFICATION",
-                Instant.now(), Instant.now(), null, null, 0);
+                Instant.now(), Instant.now(), null, null, 0L);
     }
 
     public static UserAccount rehydrate(Long id, Email email, PasswordHash passwordHash, String role, String description, String status, Instant createdAt, Instant updatedAt,
-                                        String passwordRecoveryToken, Instant tokenExpiryDate, int sessionVersion) {
+                                        String passwordRecoveryToken, Instant tokenExpiryDate, Long sessionVersion) {
         return new UserAccount(id, email, passwordHash, role, description, status, createdAt, updatedAt,
                 passwordRecoveryToken, tokenExpiryDate, sessionVersion);
     }
@@ -85,5 +85,5 @@ public class UserAccount {
 
     public String getPasswordRecoveryToken() { return passwordRecoveryToken; }
     public Instant getTokenExpiryDate() { return tokenExpiryDate; }
-    public int getSessionVersion() { return sessionVersion; }
+    public Long getSessionVersion() { return sessionVersion; }
 }
