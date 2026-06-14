@@ -1,0 +1,67 @@
+package brandradar.iam.interfaces.rest;
+
+import brandradar.iam.application.commandservices.UserAccountCommandService;
+import brandradar.iam.application.queries.GetAllUserAccountsQuery;
+import brandradar.iam.application.queries.GetUserAccountByIdQuery;
+import brandradar.iam.application.queryservices.UserAccountQueryService;
+import brandradar.iam.interfaces.rest.resources.CreateUserAccountResource;
+import brandradar.iam.interfaces.rest.resources.UserAccountResource;
+import brandradar.iam.interfaces.rest.transform.CreateUserAccountCommandFromResourceAssembler;
+import brandradar.iam.interfaces.rest.transform.UserAccountResourceFromEntityAssembler;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+
+@RestController
+@RequestMapping(value = "/api/v1/user-accounts", produces = APPLICATION_JSON_VALUE)
+@Tag(name = "User Accounts", description = "IAM - User Account management endpoints")
+public class UserAccountController {
+
+    private final UserAccountCommandService userAccountCommandService;
+    private final UserAccountQueryService userAccountQueryService;
+
+    public UserAccountController(UserAccountCommandService userAccountCommandService,
+                                 UserAccountQueryService userAccountQueryService) {
+        this.userAccountCommandService = userAccountCommandService;
+        this.userAccountQueryService = userAccountQueryService;
+    }
+
+    @Operation(summary = "Create a new user account")
+    @PostMapping
+    public ResponseEntity<UserAccountResource> createUserAccount(
+            @Valid @RequestBody CreateUserAccountResource resource) {
+        var command = CreateUserAccountCommandFromResourceAssembler.toCommand(resource);
+        var result = userAccountCommandService.handle(command);
+        return result
+                .map(UserAccountResourceFromEntityAssembler::toResourceFromEntity)
+                .map(r -> ResponseEntity.status(HttpStatus.CREATED).body(r))
+                .orElse(ResponseEntity.status(HttpStatus.CONFLICT).build());
+    }
+
+    @Operation(summary = "Get all user accounts")
+    @GetMapping
+    public ResponseEntity<List<UserAccountResource>> getAllUserAccounts() {
+        var users = userAccountQueryService.handle(new GetAllUserAccountsQuery());
+        var resources = users.stream()
+                .map(UserAccountResourceFromEntityAssembler::toResourceFromEntity)
+                .toList();
+        return ResponseEntity.ok(resources);
+    }
+
+    @Operation(summary = "Get user account by ID")
+    @GetMapping("/{id}")
+    public ResponseEntity<UserAccountResource> getUserAccountById(@PathVariable Long id) {
+        var result = userAccountQueryService.handle(new GetUserAccountByIdQuery(id));
+        return result
+                .map(UserAccountResourceFromEntityAssembler::toResourceFromEntity)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+}
