@@ -6,9 +6,13 @@ import brandradar.brandworkspace.application.queries.GetWorkspacesByUserIdQuery;
 import brandradar.brandworkspace.application.queryservices.BrandWorkspaceQueryService;
 import brandradar.brandworkspace.interfaces.rest.resources.BrandWorkspaceResource;
 import brandradar.brandworkspace.interfaces.rest.resources.CreateBrandWorkspaceResource;
+import brandradar.brandworkspace.interfaces.rest.resources.UpdateBrandWorkspaceResource;
 import brandradar.brandworkspace.interfaces.rest.transform.BrandWorkspaceResourceFromEntityAssembler;
 import brandradar.brandworkspace.interfaces.rest.transform.CreateBrandWorkspaceCommandFromResourceAssembler;
+import brandradar.brandworkspace.interfaces.rest.transform.UpdateBrandWorkspaceCommandFromResourceAssembler;
 import brandradar.shared.exception.DomainValidationException;
+import brandradar.shared.exception.ResourceNotFoundException;
+import brandradar.shared.exception.UnauthorizedWorkspaceAccessException;
 import brandradar.shared.infrastructure.security.AuthenticatedUser;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -84,5 +88,27 @@ public class BrandWorkspacesController {
                 .map(BrandWorkspaceResourceFromEntityAssembler::toResourceFromEntity)
                 .toList();
         return ResponseEntity.ok(resources);
+    }
+
+    @Operation(summary = "Update name/description of an ACTIVO workspace owned by the authenticated user")
+    @PutMapping("/{id}")
+    public ResponseEntity<BrandWorkspaceResource> updateWorkspace(
+            @PathVariable Long id, @Valid @RequestBody UpdateBrandWorkspaceResource resource) {
+        var userId = AuthenticatedUser.getId();
+        if (userId.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        var command = UpdateBrandWorkspaceCommandFromResourceAssembler.toCommand(id, userId.get(), resource);
+        try {
+            var updated = commandService.handle(command);
+            return ResponseEntity.ok(BrandWorkspaceResourceFromEntityAssembler.toResourceFromEntity(updated));
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (UnauthorizedWorkspaceAccessException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        } catch (DomainValidationException e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 }

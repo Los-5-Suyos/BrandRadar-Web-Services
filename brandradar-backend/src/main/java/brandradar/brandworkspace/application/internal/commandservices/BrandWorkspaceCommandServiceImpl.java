@@ -1,11 +1,14 @@
 package brandradar.brandworkspace.application.internal.commandservices;
 
 import brandradar.brandworkspace.application.commands.CreateBrandWorkspaceCommand;
+import brandradar.brandworkspace.application.commands.UpdateBrandWorkspaceCommand;
 import brandradar.brandworkspace.application.commandservices.BrandWorkspaceCommandService;
 import brandradar.brandworkspace.domain.model.aggregates.BrandWorkspace;
 import brandradar.brandworkspace.domain.model.repositories.BrandWorkspaceRepository;
 import brandradar.brandworkspace.domain.model.valueobjects.WorkspaceStatus;
 import brandradar.shared.exception.DomainValidationException;
+import brandradar.shared.exception.ResourceNotFoundException;
+import brandradar.shared.exception.UnauthorizedWorkspaceAccessException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,5 +43,27 @@ public class BrandWorkspaceCommandServiceImpl implements BrandWorkspaceCommandSe
         var saved = brandWorkspaceRepository.save(workspace);
         log.info("BrandWorkspace created with id={}", saved.getId());
         return Optional.of(saved);
+    }
+
+    @Override
+    @Transactional
+    public BrandWorkspace handle(UpdateBrandWorkspaceCommand command) {
+        var existing = brandWorkspaceRepository.findById(command.id())
+                .orElseThrow(() -> new ResourceNotFoundException("Workspace " + command.id() + " not found"));
+
+        if (!existing.getUserId().equals(command.userId())) {
+            throw new UnauthorizedWorkspaceAccessException(
+                    "User " + command.userId() + " does not own workspace " + command.id());
+        }
+
+        if (existing.getStatus() != WorkspaceStatus.ACTIVO) {
+            throw new DomainValidationException("Only ACTIVO workspaces can be updated");
+        }
+
+        var updated = BrandWorkspace.rehydrate(existing.getId(), existing.getUserId(), command.name(),
+                command.description(), existing.getStatus(), existing.getCreatedAt(), existing.getUpdatedAt());
+        var saved = brandWorkspaceRepository.save(updated);
+        log.info("BrandWorkspace updated with id={}", saved.getId());
+        return saved;
     }
 }
