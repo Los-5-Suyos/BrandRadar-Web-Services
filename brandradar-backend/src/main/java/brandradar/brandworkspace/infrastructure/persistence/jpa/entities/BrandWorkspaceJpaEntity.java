@@ -27,17 +27,11 @@ public class BrandWorkspaceJpaEntity {
     @Column(name = "BWS_name", nullable = false, length = 255)
     private String name;
 
-    @Column(name = "BWS_plan", nullable = false, length = 20)
-    private String plan;
+    @Column(name = "BWS_description", columnDefinition = "TEXT")
+    private String description;
 
-    @Column(name = "BWS_status", nullable = false, length = 30)
+    @Column(name = "BWS_status", nullable = false, length = 20)
     private String status;
-
-    @Column(name = "BWS_policy_max_brands", nullable = false)
-    private Integer policyMaxBrands;
-
-    @Column(name = "BWS_policy_alert_quota", nullable = false)
-    private Integer policyAlertQuota;
 
     @CreatedDate
     @Column(name = "BWS_created_at", nullable = false, updatable = false)
@@ -47,14 +41,11 @@ public class BrandWorkspaceJpaEntity {
     @Column(name = "BWS_updated_at", nullable = false)
     private Instant updatedAt;
 
-    public BrandWorkspaceJpaEntity(Long id, Long userId, String name, String plan,
-                                   String status, Integer policyMaxBrands, Integer policyAlertQuota) {
+    public BrandWorkspaceJpaEntity(Long id, Long userId, String name, String description, String status) {
         this.id = id;
         this.userId = userId;
         this.name = name;
-        this.plan = plan;
+        this.description = description;
         this.status = status;
-        this.policyMaxBrands = policyMaxBrands;
-        this.policyAlertQuota = policyAlertQuota;
     }
 }

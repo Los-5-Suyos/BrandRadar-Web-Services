@@ -12,10 +12,8 @@ public class BrandWorkspaceResourceFromEntityAssembler {
                 workspace.getId(),
                 workspace.getUserId(),
                 workspace.getName().value(),
-                workspace.getPlan(),
-                workspace.getStatus(),
-                workspace.getPolicyMaxBrands(),
-                workspace.getPolicyAlertQuota(),
+                workspace.getDescription(),
+                workspace.getStatus().name(),
                 workspace.getCreatedAt(),
                 workspace.getUpdatedAt()
         );

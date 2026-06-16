@@ -12,7 +12,7 @@ public class CreateBrandWorkspaceCommandFromResourceAssembler {
         return new CreateBrandWorkspaceCommand(
                 resource.userId(),
                 new WorkspaceName(resource.name()),
-                resource.plan() != null ? resource.plan() : "FREE"
+                resource.description()
         );
     }
 }

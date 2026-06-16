@@ -23,7 +23,7 @@ public class BrandWorkspaceCommandServiceImpl implements BrandWorkspaceCommandSe
     @Override
     @Transactional
     public Optional<BrandWorkspace> handle(CreateBrandWorkspaceCommand command) {
-        var workspace = BrandWorkspace.create(command.userId(), command.name(), command.plan());
+        var workspace = BrandWorkspace.create(command.userId(), command.name(), command.description());
         var saved = brandWorkspaceRepository.save(workspace);
         log.info("BrandWorkspace created with id={}", saved.getId());
         return Optional.of(saved);
