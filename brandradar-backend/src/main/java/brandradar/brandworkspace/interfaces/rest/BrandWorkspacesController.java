@@ -56,20 +56,30 @@ public class BrandWorkspacesController {
         }
     }
 
-    @Operation(summary = "Get workspace by ID")
+    @Operation(summary = "Get a workspace owned by the authenticated user by ID")
     @GetMapping("/{id}")
     public ResponseEntity<BrandWorkspaceResource> getWorkspaceById(@PathVariable Long id) {
-        var result = queryService.handle(new GetWorkspaceByIdQuery(id));
+        var userId = AuthenticatedUser.getId();
+        if (userId.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        var result = queryService.handle(new GetWorkspaceByIdQuery(id, userId.get()));
         return result
                 .map(BrandWorkspaceResourceFromEntityAssembler::toResourceFromEntity)
                 .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+                .orElse(ResponseEntity.status(HttpStatus.FORBIDDEN).build());
     }
 
-    @Operation(summary = "Get workspaces by user ID")
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<BrandWorkspaceResource>> getWorkspacesByUserId(@PathVariable Long userId) {
-        var workspaces = queryService.handle(new GetWorkspacesByUserIdQuery(userId));
+    @Operation(summary = "Get the active workspaces of the authenticated user")
+    @GetMapping
+    public ResponseEntity<List<BrandWorkspaceResource>> getWorkspaces() {
+        var userId = AuthenticatedUser.getId();
+        if (userId.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        var workspaces = queryService.handle(new GetWorkspacesByUserIdQuery(userId.get()));
         var resources = workspaces.stream()
                 .map(BrandWorkspaceResourceFromEntityAssembler::toResourceFromEntity)
                 .toList();
