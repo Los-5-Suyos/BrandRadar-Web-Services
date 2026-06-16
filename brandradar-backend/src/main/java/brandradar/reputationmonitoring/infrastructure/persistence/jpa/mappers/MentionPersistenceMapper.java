@@ -1,6 +1,8 @@
 package brandradar.reputationmonitoring.infrastructure.persistence.jpa.mappers;
 
 import brandradar.reputationmonitoring.domain.model.aggregates.Mention;
+import brandradar.reputationmonitoring.domain.model.valueobjects.SentimentLabel;
+import brandradar.reputationmonitoring.domain.model.valueobjects.SourceType;
 import brandradar.reputationmonitoring.infrastructure.persistence.jpa.entities.MentionJpaEntity;
 
 public class MentionPersistenceMapper {
@@ -10,41 +12,33 @@ public class MentionPersistenceMapper {
     public static MentionJpaEntity toJpaEntity(Mention mention) {
         return new MentionJpaEntity(
                 mention.getId(),
-                mention.getMentionStreamId(),
-                mention.getBrandId(),
+                mention.getWorkspaceId(),
+                mention.getSource().name(),
+                mention.getAuthorName(),
+                mention.getAuthorFollowers(),
                 mention.getContent(),
-                mention.getSourcePlatform(),
-                mention.getSourceUrl(),
-                mention.getSourceReliability(),
-                mention.getAuthor(),
+                mention.getUrl(),
+                mention.getSentimentScore(),
+                mention.getSentimentLabel().name(),
                 mention.getPublishedAt(),
-                mention.getCategory(),
-                mention.getSentimentPositive(),
-                mention.getSentimentNegative(),
-                mention.getSentimentNeutral(),
-                mention.getSentimentCompound(),
-                mention.getSentimentConfidence()
+                mention.isActive()
         );
     }
 
     public static Mention toDomain(MentionJpaEntity entity) {
         return Mention.rehydrate(
                 entity.getId(),
-                entity.getMentionStreamId(),
-                entity.getBrandId(),
+                entity.getWorkspaceId(),
+                SourceType.valueOf(entity.getSource()),
+                entity.getAuthorName(),
+                entity.getAuthorFollowers(),
                 entity.getContent(),
-                entity.getSourcePlatform(),
-                entity.getSourceUrl(),
-                entity.getSourceReliability(),
-                entity.getAuthor(),
+                entity.getUrl(),
+                entity.getSentimentScore(),
+                SentimentLabel.valueOf(entity.getSentimentLabel()),
                 entity.getPublishedAt(),
-                entity.getCategory(),
-                entity.getSentimentPositive(),
-                entity.getSentimentNegative(),
-                entity.getSentimentNeutral(),
-                entity.getSentimentCompound(),
-                entity.getSentimentConfidence(),
-                entity.getCreatedAt()
+                entity.getCreatedAt(),
+                entity.isActive()
         );
     }
 }
