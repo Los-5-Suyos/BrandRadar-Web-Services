@@ -1,6 +1,7 @@
 package brandradar.brandworkspace.interfaces.rest;
 
 import brandradar.brandworkspace.application.commandservices.BrandWorkspaceCommandService;
+import brandradar.brandworkspace.application.commands.DeactivateBrandWorkspaceCommand;
 import brandradar.brandworkspace.application.queries.GetWorkspaceByIdQuery;
 import brandradar.brandworkspace.application.queries.GetWorkspacesByUserIdQuery;
 import brandradar.brandworkspace.application.queryservices.BrandWorkspaceQueryService;
@@ -109,6 +110,24 @@ public class BrandWorkspacesController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         } catch (DomainValidationException e) {
             return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @Operation(summary = "Deactivate (soft delete) a workspace owned by the authenticated user")
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deactivateWorkspace(@PathVariable Long id) {
+        var userId = AuthenticatedUser.getId();
+        if (userId.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        try {
+            commandService.handle(new DeactivateBrandWorkspaceCommand(id, userId.get()));
+            return ResponseEntity.noContent().build();
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (UnauthorizedWorkspaceAccessException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
     }
 }
