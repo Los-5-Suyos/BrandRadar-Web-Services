@@ -41,11 +41,13 @@ public class BrandWorkspaceJpaEntity {
     @Column(name = "BWS_updated_at", nullable = false)
     private Instant updatedAt;
 
-    public BrandWorkspaceJpaEntity(Long id, Long userId, String name, String description, String status) {
+    public BrandWorkspaceJpaEntity(Long id, Long userId, String name, String description, String status,
+                                   Instant createdAt) {
         this.id = id;
         this.userId = userId;
         this.name = name;
         this.description = description;
         this.status = status;
+        this.createdAt = createdAt;
     }
 }

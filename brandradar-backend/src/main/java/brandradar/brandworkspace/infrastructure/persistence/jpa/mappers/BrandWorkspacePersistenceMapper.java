@@ -15,7 +15,8 @@ public class BrandWorkspacePersistenceMapper {
                 workspace.getUserId(),
                 workspace.getName().value(),
                 workspace.getDescription(),
-                workspace.getStatus().name()
+                workspace.getStatus().name(),
+                workspace.getCreatedAt()
         );
     }
 
