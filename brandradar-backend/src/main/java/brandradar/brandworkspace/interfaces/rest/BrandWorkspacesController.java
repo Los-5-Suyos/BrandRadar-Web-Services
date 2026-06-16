@@ -8,6 +8,8 @@ import brandradar.brandworkspace.interfaces.rest.resources.BrandWorkspaceResourc
 import brandradar.brandworkspace.interfaces.rest.resources.CreateBrandWorkspaceResource;
 import brandradar.brandworkspace.interfaces.rest.transform.BrandWorkspaceResourceFromEntityAssembler;
 import brandradar.brandworkspace.interfaces.rest.transform.CreateBrandWorkspaceCommandFromResourceAssembler;
+import brandradar.shared.exception.DomainValidationException;
+import brandradar.shared.infrastructure.security.AuthenticatedUser;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -33,16 +35,25 @@ public class BrandWorkspacesController {
         this.queryService = queryService;
     }
 
-    @Operation(summary = "Create a new workspace")
+    @Operation(summary = "Create a new workspace for the authenticated user")
     @PostMapping
     public ResponseEntity<BrandWorkspaceResource> createWorkspace(
             @Valid @RequestBody CreateBrandWorkspaceResource resource) {
-        var command = CreateBrandWorkspaceCommandFromResourceAssembler.toCommand(resource);
-        var result = commandService.handle(command);
-        return result
-                .map(BrandWorkspaceResourceFromEntityAssembler::toResourceFromEntity)
-                .map(r -> ResponseEntity.status(HttpStatus.CREATED).body(r))
-                .orElse(ResponseEntity.badRequest().build());
+        var userId = AuthenticatedUser.getId();
+        if (userId.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        var command = CreateBrandWorkspaceCommandFromResourceAssembler.toCommand(resource, userId.get());
+        try {
+            var result = commandService.handle(command);
+            return result
+                    .map(BrandWorkspaceResourceFromEntityAssembler::toResourceFromEntity)
+                    .map(r -> ResponseEntity.status(HttpStatus.CREATED).body(r))
+                    .orElse(ResponseEntity.badRequest().build());
+        } catch (DomainValidationException e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @Operation(summary = "Get workspace by ID")

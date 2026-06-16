@@ -8,9 +8,9 @@ public class CreateBrandWorkspaceCommandFromResourceAssembler {
 
     private CreateBrandWorkspaceCommandFromResourceAssembler() {}
 
-    public static CreateBrandWorkspaceCommand toCommand(CreateBrandWorkspaceResource resource) {
+    public static CreateBrandWorkspaceCommand toCommand(CreateBrandWorkspaceResource resource, Long userId) {
         return new CreateBrandWorkspaceCommand(
-                resource.userId(),
+                userId,
                 new WorkspaceName(resource.name()),
                 resource.description()
         );
