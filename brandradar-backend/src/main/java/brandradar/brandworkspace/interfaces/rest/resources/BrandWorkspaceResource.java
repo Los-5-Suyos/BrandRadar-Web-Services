@@ -6,10 +6,8 @@ public record BrandWorkspaceResource(
         Long id,
         Long userId,
         String name,
-        String plan,
+        String description,
         String status,
-        Integer policyMaxBrands,
-        Integer policyAlertQuota,
         Instant createdAt,
         Instant updatedAt
 ) {}

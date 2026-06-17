@@ -5,6 +5,7 @@ import brandradar.brandworkspace.application.queries.GetWorkspacesByUserIdQuery;
 import brandradar.brandworkspace.application.queryservices.BrandWorkspaceQueryService;
 import brandradar.brandworkspace.domain.model.aggregates.BrandWorkspace;
 import brandradar.brandworkspace.domain.model.repositories.BrandWorkspaceRepository;
+import brandradar.brandworkspace.domain.model.valueobjects.WorkspaceStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,11 +22,14 @@ public class BrandWorkspaceQueryServiceImpl implements BrandWorkspaceQueryServic
 
     @Override
     public Optional<BrandWorkspace> handle(GetWorkspaceByIdQuery query) {
-        return brandWorkspaceRepository.findById(query.id());
+        return brandWorkspaceRepository.findByIdAndUserId(query.id(), query.userId());
     }
 
     @Override
     public List<BrandWorkspace> handle(GetWorkspacesByUserIdQuery query) {
-        return brandWorkspaceRepository.findByUserId(query.userId());
+        return brandWorkspaceRepository.findByUserId(query.userId())
+                .stream()
+                .filter(workspace -> workspace.getStatus() == WorkspaceStatus.ACTIVO)
+                .toList();
     }
 }

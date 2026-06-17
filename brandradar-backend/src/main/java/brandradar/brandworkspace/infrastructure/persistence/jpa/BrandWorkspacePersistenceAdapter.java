@@ -2,6 +2,7 @@ package brandradar.brandworkspace.infrastructure.persistence.jpa;
 
 import brandradar.brandworkspace.domain.model.aggregates.BrandWorkspace;
 import brandradar.brandworkspace.domain.model.repositories.BrandWorkspaceRepository;
+import brandradar.brandworkspace.domain.model.valueobjects.WorkspaceStatus;
 import brandradar.brandworkspace.infrastructure.persistence.jpa.mappers.BrandWorkspacePersistenceMapper;
 import brandradar.brandworkspace.infrastructure.persistence.jpa.repositories.SpringDataBrandWorkspaceRepository;
 import org.springframework.stereotype.Repository;
@@ -40,15 +41,24 @@ public class BrandWorkspacePersistenceAdapter implements BrandWorkspaceRepositor
     }
 
     @Override
-    public List<BrandWorkspace> findAll() {
-        return springDataRepository.findAll()
+    public Optional<BrandWorkspace> findByIdAndUserId(Long id, Long userId) {
+        return springDataRepository.findByIdAndUserId(id, userId)
+                .map(BrandWorkspacePersistenceMapper::toDomain);
+    }
+
+    @Override
+    public List<BrandWorkspace> findByStatus(WorkspaceStatus status) {
+        return springDataRepository.findByStatus(status.name())
                 .stream()
                 .map(BrandWorkspacePersistenceMapper::toDomain)
                 .toList();
     }
 
     @Override
-    public void deleteById(Long id) {
-        springDataRepository.deleteById(id);
+    public List<BrandWorkspace> findAll() {
+        return springDataRepository.findAll()
+                .stream()
+                .map(BrandWorkspacePersistenceMapper::toDomain)
+                .toList();
     }
 }

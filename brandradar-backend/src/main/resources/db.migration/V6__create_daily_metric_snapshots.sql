@@ -1,0 +1,20 @@
+CREATE TABLE DailyMetricSnapshot (
+    DMS_id                         INT AUTO_INCREMENT PRIMARY KEY,
+    BWS_id                         INT NOT NULL,
+    DMS_snapshot_date              DATE NOT NULL,
+    DMS_sentiment_score            INT NOT NULL,
+    DMS_sentiment_score_label      ENUM('ROJO', 'AMBER', 'VERDE') NOT NULL,
+    DMS_total_mentions             INT NOT NULL DEFAULT 0,
+    DMS_negative_count             INT NOT NULL DEFAULT 0,
+    DMS_neutral_count              INT NOT NULL DEFAULT 0,
+    DMS_positive_count             INT NOT NULL DEFAULT 0,
+    DMS_negative_percent           DECIMAL(5,2) NOT NULL DEFAULT 0.00,
+    DMS_neutral_percent            DECIMAL(5,2) NOT NULL DEFAULT 0.00,
+    DMS_positive_percent           DECIMAL(5,2) NOT NULL DEFAULT 0.00,
+    DMS_variation_vs_yesterday     DECIMAL(6,2),
+    DMS_top_source                 ENUM('FACEBOOK', 'TWITTER', 'TIKTOK', 'REDDIT', 'NEWS', 'YOUTUBE') NOT NULL,
+    DMS_top_source_sentiment_index ENUM('ALTO', 'MEDIO', 'BAJO') NOT NULL,
+    DMS_calculated_at              DATETIME NOT NULL,
+    UNIQUE KEY uq_workspace_snapshot_date (BWS_id, DMS_snapshot_date),
+    FOREIGN KEY (BWS_id) REFERENCES BrandWorkspace(BWS_id)
+);

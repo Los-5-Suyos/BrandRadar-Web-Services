@@ -21,72 +21,53 @@ public class MentionJpaEntity {
     @Column(name = "MEN_id")
     private Long id;
 
-    @Column(name = "MES_id")
-    private Long mentionStreamId;
+    @Column(name = "BWS_id", nullable = false)
+    private Long workspaceId;
 
-    @Column(name = "BRA_id", nullable = false)
-    private Long brandId;
+    @Column(name = "MEN_source", nullable = false, length = 20)
+    private String source;
+
+    @Column(name = "MEN_author_name", length = 255)
+    private String authorName;
+
+    @Column(name = "MEN_author_followers")
+    private Integer authorFollowers;
 
     @Column(name = "MEN_content", nullable = false, columnDefinition = "TEXT")
     private String content;
 
-    @Column(name = "MEN_source_platform", length = 100)
-    private String sourcePlatform;
+    @Column(name = "MEN_url", length = 2000)
+    private String url;
 
-    @Column(name = "MEN_source_url", length = 2000)
-    private String sourceUrl;
+    @Column(name = "MEN_sentiment_score", nullable = false, precision = 4, scale = 3)
+    private BigDecimal sentimentScore;
 
-    @Column(name = "MEN_source_reliability", nullable = false)
-    private BigDecimal sourceReliability;
+    @Column(name = "MEN_sentiment_label", nullable = false, length = 10)
+    private String sentimentLabel;
 
-    @Column(name = "MEN_author", length = 255)
-    private String author;
-
-    @Column(name = "MEN_published_at")
+    @Column(name = "MEN_published_at", nullable = false)
     private Instant publishedAt;
-
-    @Column(name = "MEN_category", length = 20)
-    private String category;
-
-    @Column(name = "MEN_sentiment_positive", nullable = false)
-    private BigDecimal sentimentPositive;
-
-    @Column(name = "MEN_sentiment_negative", nullable = false)
-    private BigDecimal sentimentNegative;
-
-    @Column(name = "MEN_sentiment_neutral", nullable = false)
-    private BigDecimal sentimentNeutral;
-
-    @Column(name = "MEN_sentiment_compound", nullable = false)
-    private BigDecimal sentimentCompound;
-
-    @Column(name = "MEN_sentiment_confidence", nullable = false)
-    private BigDecimal sentimentConfidence;
 
     @CreatedDate
     @Column(name = "MEN_created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
-    public MentionJpaEntity(Long id, Long mentionStreamId, Long brandId, String content,
-                            String sourcePlatform, String sourceUrl, BigDecimal sourceReliability,
-                            String author, Instant publishedAt, String category,
-                            BigDecimal sentimentPositive, BigDecimal sentimentNegative,
-                            BigDecimal sentimentNeutral, BigDecimal sentimentCompound,
-                            BigDecimal sentimentConfidence) {
+    @Column(name = "MEN_is_active", nullable = false)
+    private boolean isActive;
+
+    public MentionJpaEntity(Long id, Long workspaceId, String source, String authorName, Integer authorFollowers,
+                            String content, String url, BigDecimal sentimentScore, String sentimentLabel,
+                            Instant publishedAt, boolean isActive) {
         this.id = id;
-        this.mentionStreamId = mentionStreamId;
-        this.brandId = brandId;
+        this.workspaceId = workspaceId;
+        this.source = source;
+        this.authorName = authorName;
+        this.authorFollowers = authorFollowers;
         this.content = content;
-        this.sourcePlatform = sourcePlatform;
-        this.sourceUrl = sourceUrl;
-        this.sourceReliability = sourceReliability;
-        this.author = author;
+        this.url = url;
+        this.sentimentScore = sentimentScore;
+        this.sentimentLabel = sentimentLabel;
         this.publishedAt = publishedAt;
-        this.category = category;
-        this.sentimentPositive = sentimentPositive;
-        this.sentimentNegative = sentimentNegative;
-        this.sentimentNeutral = sentimentNeutral;
-        this.sentimentCompound = sentimentCompound;
-        this.sentimentConfidence = sentimentConfidence;
+        this.isActive = isActive;
     }
 }
