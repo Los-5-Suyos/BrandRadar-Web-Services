@@ -10,4 +10,5 @@ public interface MentionRepository {
     Optional<Mention> findById(Long id);
     List<Mention> findByBrandId(Long brandId);
     List<Mention> findByMentionStreamId(Long mentionStreamId);
+    boolean existsBySourceUrl(String sourceUrl);
 }

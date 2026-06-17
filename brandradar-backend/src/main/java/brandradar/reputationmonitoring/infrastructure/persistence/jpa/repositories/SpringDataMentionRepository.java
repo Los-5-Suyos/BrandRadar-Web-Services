@@ -8,4 +8,5 @@ import java.util.List;
 public interface SpringDataMentionRepository extends JpaRepository<MentionJpaEntity, Long> {
     List<MentionJpaEntity> findByBrandId(Long brandId);
     List<MentionJpaEntity> findByMentionStreamId(Long mentionStreamId);
+    boolean existsBySourceUrl(String sourceUrl);
 }
