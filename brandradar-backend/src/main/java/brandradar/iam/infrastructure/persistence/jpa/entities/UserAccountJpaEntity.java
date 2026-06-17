@@ -31,13 +31,18 @@ public class UserAccountJpaEntity extends AuditableModel {
     @Column(name = "USU_status", nullable = false, length = 30)
     private String status;
 
+    @Column(name = "USU_failed_login_attempts", nullable = false)
+    private int failedLoginAttempts;
+
     public UserAccountJpaEntity(Long id, String email, String passwordHash,
-                                String role, String description, String status) {
+                                String role, String description, String status,
+                                int failedLoginAttempts) {
         this.id = id;
         this.email = email;
         this.passwordHash = passwordHash;
         this.role = role;
         this.description = description;
         this.status = status;
+        this.failedLoginAttempts = failedLoginAttempts;
     }
 }

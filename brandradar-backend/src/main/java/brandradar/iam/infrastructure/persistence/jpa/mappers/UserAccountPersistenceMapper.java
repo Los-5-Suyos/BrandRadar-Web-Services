@@ -16,7 +16,8 @@ public class UserAccountPersistenceMapper {
                 userAccount.getPasswordHash().value(),
                 userAccount.getRole(),
                 userAccount.getDescription(),
-                userAccount.getStatus()
+                userAccount.getStatus(),
+                userAccount.getFailedLoginAttempts()
         );
     }
 
@@ -28,8 +29,9 @@ public class UserAccountPersistenceMapper {
                 entity.getRole(),
                 entity.getDescription(),
                 entity.getStatus(),
+                entity.getFailedLoginAttempts(),
                 entity.getCreatedAt(),
                 entity.getUpdatedAt()
         );
     }
-}
+}
