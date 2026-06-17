@@ -1,0 +1,54 @@
+package brandradar.reputationmonitoring.application.services;
+
+import brandradar.reputationmonitoring.domain.model.aggregates.Mention;
+import brandradar.reputationmonitoring.domain.model.repositories.MentionRepository;
+import brandradar.reputationmonitoring.infrastructure.providers.GoogleNewsRssProvider;
+import brandradar.reputationmonitoring.infrastructure.providers.NewsApiProvider;
+import brandradar.reputationmonitoring.infrastructure.providers.RedditProvider;
+import brandradar.reputationmonitoring.infrastructure.providers.YouTubeProvider;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Slf4j
+@Service
+public class MentionIngestionService {
+
+    private final NewsApiProvider newsApiProvider;
+    private final RedditProvider redditProvider;
+    private final GoogleNewsRssProvider googleNewsRssProvider;
+    private final YouTubeProvider youTubeProvider;
+    private final MentionRepository mentionRepository;
+
+    public MentionIngestionService(NewsApiProvider newsApiProvider, RedditProvider redditProvider, GoogleNewsRssProvider googleNewsRssProvider, YouTubeProvider youTubeProvider, MentionRepository mentionRepository) {
+        this.newsApiProvider = newsApiProvider;
+        this.redditProvider = redditProvider;
+        this.googleNewsRssProvider = googleNewsRssProvider;
+        this.youTubeProvider = youTubeProvider;
+        this.mentionRepository = mentionRepository;
+    }
+
+    @Transactional
+    public List<Mention> ingestForBrand(Long brandId, String brandName) {
+        log.info("MentionIngestionService - Starting ingestion for brand id={} name={}", brandId, brandName);
+
+        List<Mention> allMentions = new ArrayList<>();
+
+        allMentions.addAll(newsApiProvider.fetchMentions(brandId, brandName));
+        allMentions.addAll(googleNewsRssProvider.fetchMentions(brandId, brandName));
+        allMentions.addAll(redditProvider.fetchMentions(brandId, brandName));
+        allMentions.addAll(youTubeProvider.fetchMentions(brandId, brandName));
+
+        log.info("MentionIngestionService - Total raw mentions fetched: {}", allMentions.size());
+
+        List<Mention> saved = allMentions.stream()
+                .map(mentionRepository::save)
+                .toList();
+
+        log.info("MentionIngestionService - Saved {} mentions for brand id={}", saved.size(), brandId);
+        return saved;
+    }
+}
