@@ -37,7 +37,7 @@ public class MentionIngestionService {
         log.info("MentionIngestionService - Total raw mentions fetched: {}", allMentions.size());
 
         List<Mention> saved = allMentions.stream()
-                .filter(mention -> !mentionRepository.existsBySourceUrl(mention.getSourceUrl()))
+                .filter(mention -> !mentionRepository.existsByUrl(mention.getSourceUrl()))
                 .map(mentionRepository::save)
                 .toList();
         

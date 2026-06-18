@@ -55,7 +55,7 @@ public class DashboardController {
         if (brands.isEmpty()) return ResponseEntity.notFound().build();
 
         var brand = brands.get(0);
-        var mentions = mentionRepository.findByBrandId(brand.getId());
+        var mentions = mentionRepository.findByWorkspaceId(workspaceId);
 
         // Calcular sentiment score
         var score = sentimentScoreCalculator.calculateForBrand(
