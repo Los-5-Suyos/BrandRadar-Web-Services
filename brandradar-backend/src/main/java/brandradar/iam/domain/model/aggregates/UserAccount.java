@@ -10,9 +10,9 @@ public class UserAccount {
 
     private static final int MAX_FAILED_ATTEMPTS = 5;
 
-    public static final String STATUS_PENDING   = "PENDIENTE_VERIFICACION";
-    public static final String STATUS_ACTIVE    = "ACTIVA";
-    public static final String STATUS_BLOCKED   = "BLOQUEADA";
+    public static final String STATUS_PENDING   = "PENDING_VERIFICATION";
+    public static final String STATUS_ACTIVE    = "ACTIVE";
+    public static final String STATUS_BLOCKED   = "BLOCKED";
 
     private final Long id;
     private final Email email;
@@ -24,7 +24,7 @@ public class UserAccount {
     private final Instant createdAt;
     private final Instant updatedAt;
     
-    // Campos añadidos en develop para recuperación de contraseña y control de sesión
+    // Campos para recuperación de contraseña y control de sesión
     private final String passwordRecoveryToken;
     private final Instant tokenExpiryDate;
     private final Long sessionVersion;
@@ -60,9 +60,8 @@ public class UserAccount {
                 createdAt, updatedAt, passwordRecoveryToken, tokenExpiryDate, sessionVersion);
     }
 
-    // ── Comportamiento de dominio (sprint3) ──────────────────────────────────────────
+    // ── Comportamiento de dominio ──────────────────────────────────────────
 
-    /** Incrementa intentos fallidos. Si llega a 5, bloquea la cuenta. */
     public void incrementFailedAttempts() {
         this.failedLoginAttempts++;
         if (this.failedLoginAttempts >= MAX_FAILED_ATTEMPTS) {
@@ -70,53 +69,41 @@ public class UserAccount {
         }
     }
 
-    /** Resetea el contador de intentos fallidos tras un login exitoso. */
     public void resetFailedAttempts() {
         this.failedLoginAttempts = 0;
     }
 
-    /** Retorna true si la cuenta está activa y puede iniciar sesión. */
     public boolean isActive() {
         return STATUS_ACTIVE.equals(this.status);
     }
 
-    /** Retorna true si la cuenta está bloqueada por intentos fallidos. */
     public boolean isBlocked() {
         return STATUS_BLOCKED.equals(this.status);
     }
 
-    /** Retorna true si la cuenta está pendiente de verificación de email. */
     public boolean isPendingVerification() {
         return STATUS_PENDING.equals(this.status);
     }
 
-    // ── Comportamiento de dominio (develop) ──────────────────────────────────────────
-
-    /**
-     * T-07: Inicia el flujo de recuperación generando un clon con el token y 15 min de vida.
-     */
     public UserAccount withPasswordRecoveryToken(String token) {
         return new UserAccount(
                 this.id, this.email, this.passwordHash, this.role, this.description, this.status,
                 this.failedLoginAttempts,
-                this.createdAt, Instant.now(), // Actualiza la fecha de modificación
+                this.createdAt, Instant.now(),
                 token,
-                Instant.now().plusSeconds(15 * 60), // Define expiración exacta en 15 minutos
+                Instant.now().plusSeconds(15 * 60),
                 this.sessionVersion
         );
     }
 
-    /**
-     * T-08: Completa el cambio de contraseña, limpia el token e incrementa sessionVersion.
-     */
     public UserAccount withUpdatedPassword(PasswordHash newPasswordHash) {
         return new UserAccount(
                 this.id, this.email, newPasswordHash, this.role, this.description, this.status,
                 this.failedLoginAttempts,
                 this.createdAt, Instant.now(),
-                null, // Limpia el token de recuperación ya utilizado
-                null, // Limpia la fecha de expiración
-                this.sessionVersion + 1 // Incrementa la versión para invalidar las sesiones activas
+                null,
+                null,
+                this.sessionVersion + 1
         );
     }
 
@@ -135,4 +122,4 @@ public class UserAccount {
     public String getPasswordRecoveryToken() { return passwordRecoveryToken; }
     public Instant getTokenExpiryDate() { return tokenExpiryDate; }
     public Long getSessionVersion() { return sessionVersion; }
-}
+}

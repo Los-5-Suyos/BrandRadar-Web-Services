@@ -10,7 +10,7 @@ public class UserAccountPersistenceMapper {
     private UserAccountPersistenceMapper() {}
 
     public static UserAccountJpaEntity toJpaEntity(UserAccount userAccount) {
-        return new UserAccountJpaEntity(
+        UserAccountJpaEntity entity = new UserAccountJpaEntity(
                 userAccount.getId(),
                 userAccount.getEmail() != null ? userAccount.getEmail().value() : null,
                 userAccount.getPasswordHash() != null ? userAccount.getPasswordHash().value() : null,
@@ -22,6 +22,9 @@ public class UserAccountPersistenceMapper {
                 userAccount.getTokenExpiryDate(),
                 userAccount.getSessionVersion()
         );
+        entity.setCreatedAt(userAccount.getCreatedAt());
+        entity.setUpdatedAt(userAccount.getUpdatedAt());
+        return entity;
     }
 
     public static UserAccount toDomain(UserAccountJpaEntity entity) {
@@ -40,4 +43,4 @@ public class UserAccountPersistenceMapper {
                 entity.getSessionVersion()
         );
     }
-}
+}

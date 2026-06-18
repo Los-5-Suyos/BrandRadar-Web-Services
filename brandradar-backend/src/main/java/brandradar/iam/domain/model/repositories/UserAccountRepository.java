@@ -12,4 +12,5 @@ public interface UserAccountRepository {
     Optional<UserAccount> findByEmail(Email email);
     boolean existsByEmail(Email email);
     List<UserAccount> findAll();
+    Optional<UserAccount> findByPasswordRecoveryToken(String token);
 }

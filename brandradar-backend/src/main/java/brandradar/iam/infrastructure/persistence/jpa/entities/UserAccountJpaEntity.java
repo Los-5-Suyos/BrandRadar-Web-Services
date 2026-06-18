@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.Instant;
 
@@ -13,7 +15,7 @@ import java.time.Instant;
 @Entity
 @NoArgsConstructor
 @Table(name = "UserAccount")
-public class UserAccountJpaEntity extends AuditableModel {
+public class UserAccountJpaEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -46,6 +48,14 @@ public class UserAccountJpaEntity extends AuditableModel {
 
     @Column(name = "USU_session_version")
     private Long sessionVersion;
+
+    @CreatedDate
+    @Column(name = "USU_created_at", nullable = false, updatable = false)
+    private Instant createdAt;
+
+    @LastModifiedDate
+    @Column(name = "USU_updated_at", nullable = false)
+    private Instant updatedAt;
 
     public UserAccountJpaEntity(Long id, String email, String passwordHash,
                                 String role, String description, String status,

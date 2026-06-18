@@ -50,4 +50,10 @@ public class UserAccountPersistenceAdapter implements UserAccountRepository {
                 .map(UserAccountPersistenceMapper::toDomain)
                 .toList();
     }
+
+    @Override
+    public Optional<UserAccount> findByPasswordRecoveryToken(String token) {
+        return springDataRepository.findByPasswordRecoveryToken(token)
+                .map(UserAccountPersistenceMapper::toDomain);
+    }
 }
