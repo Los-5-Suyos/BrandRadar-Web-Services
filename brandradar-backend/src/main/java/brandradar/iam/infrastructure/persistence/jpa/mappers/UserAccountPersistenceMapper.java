@@ -10,7 +10,6 @@ public class UserAccountPersistenceMapper {
     private UserAccountPersistenceMapper() {}
 
     public static UserAccountJpaEntity toJpaEntity(UserAccount userAccount) {
-        // Construimos la entidad JPA pasando los valores exactos con sus paréntesis de método
         UserAccountJpaEntity entity = new UserAccountJpaEntity(
                 userAccount.getId(),
                 userAccount.getEmail() != null ? userAccount.getEmail().value() : null,
@@ -18,16 +17,13 @@ public class UserAccountPersistenceMapper {
                 userAccount.getRole(),
                 userAccount.getDescription(),
                 userAccount.getStatus(),
+                userAccount.getFailedLoginAttempts(),
                 userAccount.getPasswordRecoveryToken(),
                 userAccount.getTokenExpiryDate(),
                 userAccount.getSessionVersion()
         );
-
-        // Seteamos los campos nuevos del Sprint 3 usando los setters que añadimos con Lombok
-        entity.setPasswordRecoveryToken(userAccount.getPasswordRecoveryToken());
-        entity.setTokenExpiryDate(userAccount.getTokenExpiryDate());
-        entity.setSessionVersion(userAccount.getSessionVersion());
-
+        entity.setCreatedAt(userAccount.getCreatedAt());
+        entity.setUpdatedAt(userAccount.getUpdatedAt());
         return entity;
     }
 
@@ -39,6 +35,7 @@ public class UserAccountPersistenceMapper {
                 entity.getRole(),
                 entity.getDescription(),
                 entity.getStatus(),
+                entity.getFailedLoginAttempts(),
                 entity.getCreatedAt(),
                 entity.getUpdatedAt(),
                 entity.getPasswordRecoveryToken(),

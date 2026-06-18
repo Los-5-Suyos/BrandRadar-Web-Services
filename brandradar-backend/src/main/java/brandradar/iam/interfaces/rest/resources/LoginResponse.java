@@ -1,9 +1,7 @@
 package brandradar.iam.interfaces.rest.resources;
 
 public record LoginResponse(
-        String token,
+        String accessToken,
         String refreshToken,
-        Long userId,
-        String email,
-        String role
+        int expiresIn
 ) {}
