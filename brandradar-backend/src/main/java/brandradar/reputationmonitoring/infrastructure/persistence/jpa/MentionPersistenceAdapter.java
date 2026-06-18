@@ -46,4 +46,9 @@ public class MentionPersistenceAdapter implements MentionRepository {
                 .map(MentionPersistenceMapper::toDomain)
                 .toList();
     }
+
+    @Override
+    public boolean existsBySourceUrl(String sourceUrl) {
+        return springDataRepository.existsBySourceUrl(sourceUrl);
+    }
 }
