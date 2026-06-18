@@ -1,7 +1,6 @@
 package brandradar.shared.infrastructure.scheduling;
 
 import brandradar.brandworkspace.domain.model.repositories.BrandWorkspaceRepository;
-import brandradar.brandworkspace.domain.model.valueobjects.WorkspaceStatus;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -20,7 +19,10 @@ public class DashboardRefreshScheduler {
     public void refreshDashboard() {
         log.info("DashboardRefreshScheduler - Starting dashboard refresh...");
         try {
-            var activeWorkspaces = brandWorkspaceRepository.findByStatus(WorkspaceStatus.ACTIVO);
+            var activeWorkspaces = brandWorkspaceRepository.findAll()
+                    .stream()
+                    .filter(w -> "MONITORING_ACTIVE".equals(w.getStatus()))
+                    .toList();
 
             log.info("DashboardRefreshScheduler - Found {} active workspaces", activeWorkspaces.size());
 

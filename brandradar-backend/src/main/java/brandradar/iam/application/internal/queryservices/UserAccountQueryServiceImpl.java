@@ -5,6 +5,7 @@ import brandradar.iam.application.queries.GetUserAccountByIdQuery;
 import brandradar.iam.application.queryservices.UserAccountQueryService;
 import brandradar.iam.domain.model.aggregates.UserAccount;
 import brandradar.iam.domain.model.repositories.UserAccountRepository;
+import brandradar.iam.domain.model.valueobjects.Email;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,12 +21,17 @@ public class UserAccountQueryServiceImpl implements UserAccountQueryService {
     }
 
     @Override
+    public List<UserAccount> handle(GetAllUserAccountsQuery query) {
+        return userAccountRepository.findAll();
+    }
+
+    @Override
     public Optional<UserAccount> handle(GetUserAccountByIdQuery query) {
         return userAccountRepository.findById(query.id());
     }
 
     @Override
-    public List<UserAccount> handle(GetAllUserAccountsQuery query) {
-        return userAccountRepository.findAll();
+    public Optional<UserAccount> findByEmail(Email email) {
+        return userAccountRepository.findByEmail(email);
     }
 }

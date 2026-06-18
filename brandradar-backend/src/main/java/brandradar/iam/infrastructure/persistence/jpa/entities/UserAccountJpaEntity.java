@@ -37,14 +37,18 @@ public class UserAccountJpaEntity {
     @Column(name = "USU_status", nullable = false, length = 30)
     private String status;
 
+    @Column(name = "USU_failed_login_attempts", nullable = false)
+    private int failedLoginAttempts;
+
     @Column(name = "USU_password_recovery_token", length = 255)
     private String passwordRecoveryToken;
 
     @Column(name = "USU_token_expiry_date")
-    private java.time.Instant tokenExpiryDate;
+    private Instant tokenExpiryDate;
 
     @Column(name = "USU_session_version")
     private Long sessionVersion;
+
     @CreatedDate
     @Column(name = "USU_created_at", nullable = false, updatable = false)
     private Instant createdAt;
@@ -55,13 +59,15 @@ public class UserAccountJpaEntity {
 
     public UserAccountJpaEntity(Long id, String email, String passwordHash,
                                 String role, String description, String status,
-                                String passwordRecoveryToken, java.time.Instant tokenExpiryDate, Long sessionVersion) {
+                                int failedLoginAttempts, String passwordRecoveryToken, 
+                                Instant tokenExpiryDate, Long sessionVersion) {
         this.id = id;
         this.email = email;
         this.passwordHash = passwordHash;
         this.role = role;
         this.description = description;
         this.status = status;
+        this.failedLoginAttempts = failedLoginAttempts;
         this.passwordRecoveryToken = passwordRecoveryToken;
         this.tokenExpiryDate = tokenExpiryDate;
         this.sessionVersion = sessionVersion;

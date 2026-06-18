@@ -43,6 +43,19 @@ public class MentionPersistenceAdapter implements MentionRepository {
     }
 
     @Override
+    public List<Mention> findByWorkspaceId(Long workspaceId) {
+        return springDataRepository.findByWorkspaceId(workspaceId)
+                .stream()
+                .map(MentionPersistenceMapper::toDomain)
+                .toList();
+    }
+
+    @Override
+    public boolean existsByUrl(String url) {
+        return springDataRepository.existsByUrl(url);
+    }
+
+    @Override
     public List<Mention> findByWorkspaceIdAndPublishedAtBetweenAndIsActiveTrue(Long workspaceId, Instant from, Instant to) {
         return springDataRepository.findByWorkspaceIdAndPublishedAtBetweenAndIsActiveTrue(workspaceId, from, to)
                 .stream()
