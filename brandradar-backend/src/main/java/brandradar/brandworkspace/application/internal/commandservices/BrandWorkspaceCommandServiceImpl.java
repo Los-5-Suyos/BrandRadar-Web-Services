@@ -45,7 +45,7 @@ public class BrandWorkspaceCommandServiceImpl implements BrandWorkspaceCommandSe
                     "User already has the maximum of " + MAX_ACTIVE_WORKSPACES + " active workspaces");
         }
 
-        var workspace = BrandWorkspace.create(command.userId(), command.name(), command.description());
+        var workspace = BrandWorkspace.create(command.userId(), command.name(), null);
         var saved = brandWorkspaceRepository.save(workspace);
         log.info("BrandWorkspace created with id={}", saved.getId());
         return Optional.of(saved);

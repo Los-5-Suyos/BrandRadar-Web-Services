@@ -11,6 +11,8 @@ public interface MentionRepository {
     Mention save(Mention mention);
     List<Mention> saveAll(List<Mention> mentions);
     Optional<Mention> findById(Long id);
+    List<Mention> findByWorkspaceId(Long workspaceId);
+    boolean existsByUrl(String url);
 
     List<Mention> findByWorkspaceIdAndPublishedAtBetweenAndIsActiveTrue(
             Long workspaceId, Instant from, Instant to);

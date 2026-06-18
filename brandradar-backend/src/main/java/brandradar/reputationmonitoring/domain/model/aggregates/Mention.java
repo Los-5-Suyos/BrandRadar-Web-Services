@@ -46,6 +46,23 @@ public class Mention {
                 sentimentScore, sentimentLabel, publishedAt, null, true);
     }
 
+    /**
+     * Factory method simplificado para providers que no generan datos de sentimiento.
+     * El sentimentScore se deja en 0.5 (neutro) y el label en NEU hasta que el
+     * SentimentScoreCalculator procese la mención.
+     */
+    public static Mention create(Long workspaceId, String content, String sourcePlatform,
+                                  String url, String authorName, Instant publishedAt) {
+        SourceType source;
+        try {
+            source = SourceType.valueOf(sourcePlatform.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            source = SourceType.TWITTER; // fallback
+        }
+        return new Mention(null, workspaceId, source, authorName, null, content, url,
+                java.math.BigDecimal.valueOf(0.5), SentimentLabel.NEU, publishedAt, null, true);
+    }
+
     public static Mention rehydrate(Long id, Long workspaceId, SourceType source, String authorName,
                                     Integer authorFollowers, String content, String url, BigDecimal sentimentScore,
                                     SentimentLabel sentimentLabel, Instant publishedAt, Instant createdAt,
@@ -66,4 +83,17 @@ public class Mention {
     public Instant getPublishedAt() { return publishedAt; }
     public Instant getCreatedAt() { return createdAt; }
     public boolean isActive() { return isActive; }
+
+    // ── Aliases de compatibilidad ─────────────────────────────────────────
+    /** Retorna el nombre de la fuente como String (ej: "TWITTER"). */
+    public String getSourcePlatform() { return source.name(); }
+
+    /** Alias de getSentimentScore() para compatibilidad con código existente. */
+    public BigDecimal getSentimentCompound() { return sentimentScore; }
+
+    /** Alias de getAuthorName() para compatibilidad con código existente. */
+    public String getAuthor() { return authorName; }
+
+    /** Alias de getUrl() para compatibilidad con código existente. */
+    public String getSourceUrl() { return url; }
 }

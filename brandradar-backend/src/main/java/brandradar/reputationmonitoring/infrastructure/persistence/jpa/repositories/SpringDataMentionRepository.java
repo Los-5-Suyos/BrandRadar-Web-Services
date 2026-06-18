@@ -8,6 +8,10 @@ import java.util.List;
 
 public interface SpringDataMentionRepository extends JpaRepository<MentionJpaEntity, Long> {
 
+    List<MentionJpaEntity> findByWorkspaceId(Long workspaceId);
+
+    boolean existsByUrl(String url);
+
     List<MentionJpaEntity> findByWorkspaceIdAndPublishedAtBetweenAndIsActiveTrue(
             Long workspaceId, Instant from, Instant to);
 
