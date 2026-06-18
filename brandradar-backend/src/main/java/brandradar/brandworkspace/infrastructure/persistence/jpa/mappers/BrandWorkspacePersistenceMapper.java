@@ -2,6 +2,7 @@ package brandradar.brandworkspace.infrastructure.persistence.jpa.mappers;
 
 import brandradar.brandworkspace.domain.model.aggregates.BrandWorkspace;
 import brandradar.brandworkspace.domain.model.valueobjects.WorkspaceName;
+import brandradar.brandworkspace.domain.model.valueobjects.WorkspaceStatus;
 import brandradar.brandworkspace.infrastructure.persistence.jpa.entities.BrandWorkspaceJpaEntity;
 
 public class BrandWorkspacePersistenceMapper {
@@ -13,10 +14,9 @@ public class BrandWorkspacePersistenceMapper {
                 workspace.getId(),
                 workspace.getUserId(),
                 workspace.getName().value(),
-                workspace.getPlan(),
-                workspace.getStatus(),
-                workspace.getPolicyMaxBrands(),
-                workspace.getPolicyAlertQuota()
+                workspace.getDescription(),
+                workspace.getStatus().name(),
+                workspace.getCreatedAt()
         );
     }
 
@@ -25,10 +25,8 @@ public class BrandWorkspacePersistenceMapper {
                 entity.getId(),
                 entity.getUserId(),
                 new WorkspaceName(entity.getName()),
-                entity.getPlan(),
-                entity.getStatus(),
-                entity.getPolicyMaxBrands(),
-                entity.getPolicyAlertQuota(),
+                entity.getDescription(),
+                WorkspaceStatus.valueOf(entity.getStatus()),
                 entity.getCreatedAt(),
                 entity.getUpdatedAt()
         );
