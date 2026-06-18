@@ -12,14 +12,19 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import brandradar.brandworkspace.infrastructure.security.filters.WorkspaceAuthorizationFilter;
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final WorkspaceAuthorizationFilter workspaceAuthorizationFilter;
 
-    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
+    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter,
+                          WorkspaceAuthorizationFilter workspaceAuthorizationFilter) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+        this.workspaceAuthorizationFilter = workspaceAuthorizationFilter;
     }
 
     @Bean
@@ -45,7 +50,9 @@ public class SecurityConfig {
                 )
 
                 // Registrar el filtro JWT antes del filtro estándar de usuario/contraseña
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                // Registrar el filtro de workspaces después del JWT
+                .addFilterAfter(workspaceAuthorizationFilter, JwtAuthenticationFilter.class);
 
         return http.build();
     }
