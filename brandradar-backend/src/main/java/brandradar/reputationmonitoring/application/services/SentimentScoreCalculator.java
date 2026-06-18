@@ -4,6 +4,7 @@ import brandradar.reputationmonitoring.domain.model.aggregates.Mention;
 import brandradar.reputationmonitoring.domain.model.valueobjects.SentimentScoreLabel;
 import brandradar.reputationmonitoring.domain.model.valueobjects.SourceType;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -29,6 +30,7 @@ import java.util.Map;
  * </ul></p>
  */
 @Component
+@Service("reputationMonitoringCalculator")
 public class SentimentScoreCalculator {
 
     /** Pesos de credibilidad por fuente, según especificación T-26. */

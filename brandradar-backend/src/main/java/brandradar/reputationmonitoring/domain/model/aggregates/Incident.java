@@ -1,5 +1,6 @@
 package brandradar.reputationmonitoring.domain.model.aggregates;
 
+import brandradar.brandworkspace.domain.model.aggregates.BrandWorkspace;
 import brandradar.reputationmonitoring.domain.model.valueobjects.SeverityLevel;
 import brandradar.reputationmonitoring.domain.model.valueobjects.IncidentStatus;
 import brandradar.shared.infrastructure.persistence.jpa.audit.AuditableModel;
@@ -20,8 +21,9 @@ public class Incident extends AuditableModel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "workspace_id", nullable = false)
-    private Long workspaceId;
+    @ManyToOne
+    @JoinColumn(name = "brand_workspace_id", nullable = false)
+    private BrandWorkspace brandWorkspace;
 
     @Column(nullable = false, length = 500)
     private String title;
