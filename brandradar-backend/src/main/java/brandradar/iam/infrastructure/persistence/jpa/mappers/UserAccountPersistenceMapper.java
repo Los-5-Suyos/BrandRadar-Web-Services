@@ -12,26 +12,32 @@ public class UserAccountPersistenceMapper {
     public static UserAccountJpaEntity toJpaEntity(UserAccount userAccount) {
         return new UserAccountJpaEntity(
                 userAccount.getId(),
-                userAccount.getEmail().value(),
-                userAccount.getPasswordHash().value(),
+                userAccount.getEmail() != null ? userAccount.getEmail().value() : null,
+                userAccount.getPasswordHash() != null ? userAccount.getPasswordHash().value() : null,
                 userAccount.getRole(),
                 userAccount.getDescription(),
                 userAccount.getStatus(),
-                userAccount.getFailedLoginAttempts()
+                userAccount.getFailedLoginAttempts(),
+                userAccount.getPasswordRecoveryToken(),
+                userAccount.getTokenExpiryDate(),
+                userAccount.getSessionVersion()
         );
     }
 
     public static UserAccount toDomain(UserAccountJpaEntity entity) {
         return UserAccount.rehydrate(
                 entity.getId(),
-                new Email(entity.getEmail()),
-                new PasswordHash(entity.getPasswordHash()),
+                entity.getEmail() != null ? new Email(entity.getEmail()) : null,
+                entity.getPasswordHash() != null ? new PasswordHash(entity.getPasswordHash()) : null,
                 entity.getRole(),
                 entity.getDescription(),
                 entity.getStatus(),
                 entity.getFailedLoginAttempts(),
                 entity.getCreatedAt(),
-                entity.getUpdatedAt()
+                entity.getUpdatedAt(),
+                entity.getPasswordRecoveryToken(),
+                entity.getTokenExpiryDate(),
+                entity.getSessionVersion()
         );
     }
 }

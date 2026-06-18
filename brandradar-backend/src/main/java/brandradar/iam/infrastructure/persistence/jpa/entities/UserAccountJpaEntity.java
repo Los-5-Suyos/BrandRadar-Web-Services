@@ -4,8 +4,12 @@ import brandradar.shared.infrastructure.persistence.jpa.audit.AuditableModel;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.time.Instant;
 
 @Getter
+@Setter
 @Entity
 @NoArgsConstructor
 @Table(name = "UserAccount")
@@ -34,9 +38,19 @@ public class UserAccountJpaEntity extends AuditableModel {
     @Column(name = "USU_failed_login_attempts", nullable = false)
     private int failedLoginAttempts;
 
+    @Column(name = "USU_password_recovery_token", length = 255)
+    private String passwordRecoveryToken;
+
+    @Column(name = "USU_token_expiry_date")
+    private Instant tokenExpiryDate;
+
+    @Column(name = "USU_session_version")
+    private Long sessionVersion;
+
     public UserAccountJpaEntity(Long id, String email, String passwordHash,
                                 String role, String description, String status,
-                                int failedLoginAttempts) {
+                                int failedLoginAttempts, String passwordRecoveryToken, 
+                                Instant tokenExpiryDate, Long sessionVersion) {
         this.id = id;
         this.email = email;
         this.passwordHash = passwordHash;
@@ -44,5 +58,8 @@ public class UserAccountJpaEntity extends AuditableModel {
         this.description = description;
         this.status = status;
         this.failedLoginAttempts = failedLoginAttempts;
+        this.passwordRecoveryToken = passwordRecoveryToken;
+        this.tokenExpiryDate = tokenExpiryDate;
+        this.sessionVersion = sessionVersion;
     }
 }
