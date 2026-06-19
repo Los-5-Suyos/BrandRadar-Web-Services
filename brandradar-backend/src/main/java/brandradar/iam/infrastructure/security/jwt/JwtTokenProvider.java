@@ -44,13 +44,14 @@ public class JwtTokenProvider {
     /**
      * Genera un refresh token con expiración de 7 días.
      */
-    public String generateRefreshToken(String email, Long userId) {
+    public String generateRefreshToken(String email, Long userId, Long sessionVersion) {
         Date now = new Date();
         Date expiry = new Date(now.getTime() + 604_800_000L); // 7 días
 
         return Jwts.builder()
                 .subject(email)
                 .claim("userId", userId)
+                .claim("sessionVersion", sessionVersion)
                 .claim("type", "refresh")
                 .issuedAt(now)
                 .expiration(expiry)
@@ -90,5 +91,9 @@ public class JwtTokenProvider {
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
+    }
+
+    public Long extractSessionVersion(String token) {
+        return parseClaims(token).get("sessionVersion", Long.class);
     }
 }

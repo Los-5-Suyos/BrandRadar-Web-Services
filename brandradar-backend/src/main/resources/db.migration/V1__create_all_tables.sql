@@ -67,6 +67,7 @@ CREATE TABLE IF NOT EXISTS BrandWorkspace (
     BWS_id                  INT AUTO_INCREMENT PRIMARY KEY,
     USU_id                  INT          NOT NULL,
     BWS_name                VARCHAR(255) NOT NULL,
+    BWS_description         VARCHAR(255),
     BWS_plan                ENUM('FREE', 'PRO', 'ENTERPRISE') NOT NULL DEFAULT 'FREE',
     BWS_status              ENUM('WITHOUT_CONFIGURATION', 'MONITORING_ACTIVE', 'INACTIVE') NOT NULL DEFAULT 'WITHOUT_CONFIGURATION',
     BWS_policy_max_brands   INT NOT NULL DEFAULT 3,

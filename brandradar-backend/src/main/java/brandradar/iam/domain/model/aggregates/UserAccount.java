@@ -2,10 +2,15 @@ package brandradar.iam.domain.model.aggregates;
 
 import brandradar.iam.domain.model.valueobjects.Email;
 import brandradar.iam.domain.model.valueobjects.PasswordHash;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 import java.time.Instant;
 import java.util.Objects;
 
+@Entity
+@Table(name = "UserAccount")
 public class UserAccount {
 
     private static final int MAX_FAILED_ATTEMPTS = 5;
@@ -14,20 +19,65 @@ public class UserAccount {
     public static final String STATUS_ACTIVE    = "ACTIVE";
     public static final String STATUS_BLOCKED   = "BLOCKED";
 
-    private final Long id;
-    private final Email email;
-    private final PasswordHash passwordHash;
-    private final String role;
-    private final String description;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "USU_id")
+    private Long id;
+
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "value", column = @Column(name = "USU_email"))
+    })
+    private Email email;
+
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "value", column = @Column(name = "USU_password_hash"))
+    })
+    private PasswordHash passwordHash;
+
+    @Column(name = "USU_role")
+    private String role;
+
+    @Column(name = "USU_description")
+    private String description;
+
+    @Column(name = "USU_status")
     private String status;
+
+    @Column(name = "USU_failed_login_attempts")
     private int failedLoginAttempts;
-    private final Instant createdAt;
-    private final Instant updatedAt;
-    
-    // Campos para recuperación de contraseña y control de sesión
-    private final String passwordRecoveryToken;
-    private final Instant tokenExpiryDate;
-    private final Long sessionVersion;
+
+    @Column(name = "USU_created_at")
+    private Instant createdAt;
+
+    @Column(name = "USU_updated_at")
+    private Instant updatedAt;
+
+    @Column(name = "USU_password_recovery_token")
+    private String passwordRecoveryToken;
+
+    @Column(name = "USU_token_expiry_date")
+    private Instant tokenExpiryDate;
+
+    @Column(name = "USU_session_version")
+    private Long sessionVersion;
+
+    protected UserAccount() {
+        this.id = null;
+        this.email = null;
+        this.passwordHash = null;
+        this.role = null;
+        this.description = null;
+        this.status = null;
+        this.failedLoginAttempts = 0;
+        this.createdAt = null;
+        this.updatedAt = null;
+        this.passwordRecoveryToken = null;
+        this.tokenExpiryDate = null;
+        this.sessionVersion = null;
+    }
+
 
     private UserAccount(Long id, Email email, PasswordHash passwordHash,
                         String role, String description, String status,
