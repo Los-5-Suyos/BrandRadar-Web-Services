@@ -18,7 +18,7 @@ import java.util.UUID;
 @Component
 public class MockMentionProvider {
 
-    private static final String[] PLATFORMS = {"REDDIT", "TWITTER", "INSTAGRAM", "TIKTOK"};
+    private static final String[] PLATFORMS = {"REDDIT", "TWITTER", "INSTAGRAM", "TIKTOK", "FACEBOOK", "NEWS"};
     private final GroqApiClient groqApiClient;
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final Random random = new Random();

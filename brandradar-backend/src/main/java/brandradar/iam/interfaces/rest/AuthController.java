@@ -2,6 +2,7 @@ package brandradar.iam.interfaces.rest;
 
 import brandradar.iam.application.commands.CreateUserAccountCommand;
 import brandradar.iam.application.commands.LoginCommand;
+import brandradar.iam.application.commands.VerifyEmailCommand;
 import brandradar.iam.application.commandservices.LoginService;
 import brandradar.iam.application.commandservices.UserAccountCommandService;
 import brandradar.iam.application.internal.commandservices.RefreshTokenService;
@@ -78,5 +79,16 @@ public class AuthController {
         // Esto disparará el 401 si el servicio lo decide
         TokenRefreshResult result = refreshTokenService.refreshResult(request.refreshToken());
         return ResponseEntity.ok(result);
+    }
+
+    @Operation(summary = "Verify user email with token")
+    @GetMapping("/verify")
+    public ResponseEntity<Map<String, String>> verifyEmail(@RequestParam("token") String token) {
+        try {
+            userAccountCommandService.handle(new VerifyEmailCommand(token));
+            return ResponseEntity.ok(Map.of("message", "Email successfully verified. Account is now active."));
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
+        }
     }
 }
