@@ -2,19 +2,34 @@ package brandradar.brandworkspace.domain.model.aggregates;
 
 import brandradar.brandworkspace.domain.model.valueobjects.WorkspaceName;
 import brandradar.brandworkspace.domain.model.valueobjects.WorkspaceStatus;
+import jakarta.persistence.*;
 
 import java.time.Instant;
 import java.util.Objects;
 
+@Entity
+@Table(name = "BrandWorkspace")
 public class BrandWorkspace {
 
-    private final Long id;
-    private final Long userId;
-    private final WorkspaceName name;
-    private final String description;
-    private final WorkspaceStatus status;
-    private final Instant createdAt;
-    private final Instant updatedAt;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // O según defina tu estrategia (id auto-incremental)
+    private Long id;
+
+    private Long userId;
+
+    @Embedded
+    private WorkspaceName name;
+
+    private String description;
+
+    @Enumerated(EnumType.STRING)
+    private WorkspaceStatus status;
+
+    private Instant createdAt;
+    private Instant updatedAt;
+
+    protected BrandWorkspace() {
+    }
 
     private BrandWorkspace(Long id, Long userId, WorkspaceName name, String description,
                            WorkspaceStatus status, Instant createdAt, Instant updatedAt) {

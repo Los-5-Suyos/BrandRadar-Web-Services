@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 @Slf4j
-@Service
+@Service("sentimentIntelligenceCalculator")
 public class SentimentScoreCalculator {
 
     private static final Map<String, Double> SOURCE_WEIGHTS = Map.of(

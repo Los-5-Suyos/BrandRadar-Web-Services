@@ -72,7 +72,7 @@ public class LoginServiceImpl implements LoginService {
         log.info("Successful login for: {}", command.email());
 
         String accessToken = jwtTokenProvider.generateToken(account.getEmail().value(), account.getId());
-        String refreshToken = jwtTokenProvider.generateRefreshToken(account.getEmail().value(), account.getId());
+        String refreshToken = jwtTokenProvider.generateRefreshToken(account.getEmail().value(), account.getId(),account.getSessionVersion());
 
         return new LoginResponse(accessToken, refreshToken, ACCESS_TOKEN_EXPIRES_IN_SECONDS);
     }

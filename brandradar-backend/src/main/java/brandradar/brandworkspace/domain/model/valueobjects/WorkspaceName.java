@@ -1,5 +1,8 @@
 package brandradar.brandworkspace.domain.model.valueobjects;
 
+import jakarta.persistence.Embeddable;
+
+@Embeddable
 public record WorkspaceName(String value) {
     public WorkspaceName {
         if (value == null || value.isBlank())

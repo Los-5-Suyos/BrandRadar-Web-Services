@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -65,4 +66,12 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(ErrorResource.of(500, "INTERNAL_ERROR", "An unexpected error occurred."));
     }
+
+    @ExceptionHandler(ResponseStatusException.class)
+    public ResponseEntity<ErrorResource> handleResponseStatusException(ResponseStatusException ex) {
+        return ResponseEntity
+                .status(ex.getStatusCode())
+                .body(ErrorResource.of(ex.getStatusCode().value(), "REQUEST_ERROR", ex.getReason()));
+    }
+
 }

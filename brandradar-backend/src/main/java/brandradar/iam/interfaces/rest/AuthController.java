@@ -5,18 +5,20 @@ import brandradar.iam.application.commands.LoginCommand;
 import brandradar.iam.application.commands.VerifyEmailCommand;
 import brandradar.iam.application.commandservices.LoginService;
 import brandradar.iam.application.commandservices.UserAccountCommandService;
+import brandradar.iam.application.internal.commandservices.RefreshTokenService;
+import brandradar.iam.application.internal.commandservices.dto.TokenRefreshResult;
 import brandradar.iam.domain.model.valueobjects.Email;
 import brandradar.iam.domain.model.valueobjects.PasswordHash;
-import brandradar.iam.interfaces.rest.resources.LoginRequest;
-import brandradar.iam.interfaces.rest.resources.LoginResponse;
-import brandradar.iam.interfaces.rest.resources.RegisterUserResource;
-import brandradar.iam.interfaces.rest.resources.RegisteredUserResource;
+import brandradar.iam.interfaces.rest.resources.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
+
+import java.util.Map;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -27,10 +29,13 @@ public class AuthController {
 
     private final LoginService loginService;
     private final UserAccountCommandService userAccountCommandService;
+    private final RefreshTokenService refreshTokenService;
 
-    public AuthController(LoginService loginService, UserAccountCommandService userAccountCommandService) {
+    public AuthController(LoginService loginService, UserAccountCommandService userAccountCommandService,
+                          RefreshTokenService refreshTokenService) {
         this.loginService = loginService;
         this.userAccountCommandService = userAccountCommandService;
+        this.refreshTokenService = refreshTokenService;
     }
 
     @Operation(summary = "Login with email and password. Returns JWT access and refresh tokens.")
@@ -62,6 +67,18 @@ public class AuthController {
                 ))
                 .map(r -> ResponseEntity.status(HttpStatus.CREATED).body(r))
                 .orElse(ResponseEntity.status(HttpStatus.CONFLICT).build());
+    }
+
+    @Operation(summary = "Refresh access and session tokens")
+    @PostMapping("/refresh")
+    public ResponseEntity<TokenRefreshResult> refresh(@RequestBody RefreshTokenRequest request) {
+        if (request.refreshToken() == null || request.refreshToken().isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El token no puede estar vacío");
+        }
+
+        // Esto disparará el 401 si el servicio lo decide
+        TokenRefreshResult result = refreshTokenService.refreshResult(request.refreshToken());
+        return ResponseEntity.ok(result);
     }
 
     @Operation(summary = "Verify user email with token")

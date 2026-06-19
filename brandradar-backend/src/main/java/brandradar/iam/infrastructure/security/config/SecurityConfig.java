@@ -1,8 +1,10 @@
 package brandradar.iam.infrastructure.security.config;
 
 import brandradar.iam.infrastructure.security.jwt.JwtAuthenticationFilter;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -14,7 +16,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import brandradar.brandworkspace.infrastructure.security.filters.WorkspaceAuthorizationFilter;
 
-@Configuration
+@Configuration("iamSecurityConfig")
 @EnableWebSecurity
 public class SecurityConfig {
 
@@ -22,7 +24,7 @@ public class SecurityConfig {
     private final WorkspaceAuthorizationFilter workspaceAuthorizationFilter;
 
     public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter,
-                          WorkspaceAuthorizationFilter workspaceAuthorizationFilter) {
+                          @Lazy WorkspaceAuthorizationFilter workspaceAuthorizationFilter) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
         this.workspaceAuthorizationFilter = workspaceAuthorizationFilter;
     }
@@ -55,6 +57,10 @@ public class SecurityConfig {
                 .addFilterAfter(workspaceAuthorizationFilter, JwtAuthenticationFilter.class);
 
         return http.build();
+    }
+    @Bean
+    public ObjectMapper objectMapper() {
+        return new ObjectMapper();
     }
 
     /**
