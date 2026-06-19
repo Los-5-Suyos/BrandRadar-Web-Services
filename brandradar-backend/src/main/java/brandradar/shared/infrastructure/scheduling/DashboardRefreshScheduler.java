@@ -1,6 +1,8 @@
 package brandradar.shared.infrastructure.scheduling;
 
 import brandradar.brandworkspace.domain.model.repositories.BrandWorkspaceRepository;
+import brandradar.brandworkspace.domain.model.repositories.BrandRepository;
+import brandradar.reputationmonitoring.application.services.MentionIngestionService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -10,9 +12,15 @@ import org.springframework.stereotype.Component;
 public class DashboardRefreshScheduler {
 
     private final BrandWorkspaceRepository brandWorkspaceRepository;
+    private final BrandRepository brandRepository;
+    private final MentionIngestionService mentionIngestionService;
 
-    public DashboardRefreshScheduler(BrandWorkspaceRepository brandWorkspaceRepository) {
+    public DashboardRefreshScheduler(BrandWorkspaceRepository brandWorkspaceRepository,
+                                     BrandRepository brandRepository,
+                                     MentionIngestionService mentionIngestionService) {
         this.brandWorkspaceRepository = brandWorkspaceRepository;
+        this.brandRepository = brandRepository;
+        this.mentionIngestionService = mentionIngestionService;
     }
 
     @Scheduled(fixedRate = 300000) // cada 5 minutos
@@ -29,8 +37,12 @@ public class DashboardRefreshScheduler {
             for (var workspace : activeWorkspaces) {
                 log.info("DashboardRefreshScheduler - Refreshing workspace id={} name={}",
                         workspace.getId(), workspace.getName().value());
-                // Aquí irá: ingesta → snapshot → detección
-                // T-25 MockMentionProvider
+                
+                var brands = brandRepository.findByWorkspaceId(workspace.getId());
+                for (var brand : brands) {
+                    mentionIngestionService.ingestForBrand(brand.getId(), brand.getName());
+                }
+                
                 // T-27 DailyMetricsService
                 // T-29 IncidentDetectionService
             }

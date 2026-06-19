@@ -31,7 +31,7 @@ public class MentionIngestionService {
 
         List<Mention> allMentions = new ArrayList<>();
 
-        allMentions.addAll(mockMentionProvider.generateMentions(brandId, brandName, 15));
+        allMentions.addAll(mockMentionProvider.generateMentions(brandId, brandName, 5));
         allMentions.addAll(youTubeProvider.fetchMentions(brandId, brandName));
 
         log.info("MentionIngestionService - Total raw mentions fetched: {}", allMentions.size());

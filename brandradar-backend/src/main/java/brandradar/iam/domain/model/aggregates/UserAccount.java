@@ -73,6 +73,10 @@ public class UserAccount {
         this.failedLoginAttempts = 0;
     }
 
+    public void activate() {
+        this.status = STATUS_ACTIVE;
+    }
+
     public boolean isActive() {
         return STATUS_ACTIVE.equals(this.status);
     }

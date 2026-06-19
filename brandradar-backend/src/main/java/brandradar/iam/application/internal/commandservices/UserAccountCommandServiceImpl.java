@@ -5,6 +5,9 @@ import brandradar.iam.application.commands.ForgotPasswordCommand;
 import brandradar.iam.application.commandservices.UserAccountCommandService;
 import brandradar.iam.domain.model.aggregates.UserAccount;
 import brandradar.iam.domain.model.repositories.UserAccountRepository;
+import brandradar.iam.domain.model.aggregates.EmailVerification;
+import brandradar.iam.domain.model.repositories.EmailVerificationRepository;
+import brandradar.iam.application.commands.VerifyEmailCommand;
 import brandradar.iam.domain.model.valueobjects.Email;
 import brandradar.iam.domain.model.valueobjects.PasswordHash;
 import lombok.extern.slf4j.Slf4j;
@@ -22,11 +25,14 @@ public class UserAccountCommandServiceImpl implements UserAccountCommandService 
 
     private final UserAccountRepository userAccountRepository;
     private final PasswordEncoder passwordEncoder;
+    private final EmailVerificationRepository emailVerificationRepository;
 
     public UserAccountCommandServiceImpl(UserAccountRepository userAccountRepository,
-                                         PasswordEncoder passwordEncoder) {
+                                         PasswordEncoder passwordEncoder,
+                                         EmailVerificationRepository emailVerificationRepository) {
         this.userAccountRepository = userAccountRepository;
         this.passwordEncoder = passwordEncoder;
+        this.emailVerificationRepository = emailVerificationRepository;
     }
 
     @Override
@@ -44,7 +50,11 @@ public class UserAccountCommandServiceImpl implements UserAccountCommandService 
                 command.description()
         );
         var saved = userAccountRepository.save(userAccount);
-        log.info("UserAccount created with id={}", saved.getId());
+        
+        var verification = EmailVerification.create(saved.getId(), java.time.Instant.now().plus(24, java.time.temporal.ChronoUnit.HOURS));
+        emailVerificationRepository.save(verification);
+        
+        log.info("UserAccount created with id={}. Verification token sent: {}", saved.getId(), verification.getToken());
         return Optional.of(saved);
     }
 
@@ -92,5 +102,31 @@ public class UserAccountCommandServiceImpl implements UserAccountCommandService 
         var updatedUserAccount = userAccount.withUpdatedPassword(newPasswordHash);
 
         userAccountRepository.save(updatedUserAccount);
+    }
+
+    @Override
+    @Transactional
+    public void handle(VerifyEmailCommand command) {
+        var verificationOpt = emailVerificationRepository.findByToken(command.token());
+        
+        if (verificationOpt.isEmpty()) {
+            throw new IllegalArgumentException("Invalid verification token.");
+        }
+        
+        var verification = verificationOpt.get();
+        if (verification.isExpired()) {
+            throw new IllegalStateException("Verification token has expired.");
+        }
+        
+        verification.markAsUsed();
+        emailVerificationRepository.save(verification);
+        
+        var userOpt = userAccountRepository.findById(verification.getUserId());
+        if (userOpt.isPresent()) {
+            var user = userOpt.get();
+            user.activate();
+            userAccountRepository.save(user);
+            log.info("UserAccount id={} has been ACTIVATED", user.getId());
+        }
     }
 }

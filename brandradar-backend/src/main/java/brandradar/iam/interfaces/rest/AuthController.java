@@ -2,6 +2,7 @@ package brandradar.iam.interfaces.rest;
 
 import brandradar.iam.application.commands.CreateUserAccountCommand;
 import brandradar.iam.application.commands.LoginCommand;
+import brandradar.iam.application.commands.VerifyEmailCommand;
 import brandradar.iam.application.commandservices.LoginService;
 import brandradar.iam.application.commandservices.UserAccountCommandService;
 import brandradar.iam.domain.model.valueobjects.Email;
@@ -61,5 +62,16 @@ public class AuthController {
                 ))
                 .map(r -> ResponseEntity.status(HttpStatus.CREATED).body(r))
                 .orElse(ResponseEntity.status(HttpStatus.CONFLICT).build());
+    }
+
+    @Operation(summary = "Verify user email with token")
+    @GetMapping("/verify")
+    public ResponseEntity<Map<String, String>> verifyEmail(@RequestParam("token") String token) {
+        try {
+            userAccountCommandService.handle(new VerifyEmailCommand(token));
+            return ResponseEntity.ok(Map.of("message", "Email successfully verified. Account is now active."));
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
+        }
     }
 }
