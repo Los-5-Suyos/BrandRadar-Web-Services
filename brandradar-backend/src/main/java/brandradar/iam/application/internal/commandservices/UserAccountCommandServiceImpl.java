@@ -1,6 +1,7 @@
 package brandradar.iam.application.internal.commandservices;
 
 import brandradar.iam.application.commands.CreateUserAccountCommand;
+import brandradar.iam.application.commands.VerifyAccountCommand;
 import brandradar.iam.application.commandservices.UserAccountCommandService;
 import brandradar.iam.domain.model.aggregates.UserAccount;
 import brandradar.iam.domain.model.repositories.UserAccountRepository;
@@ -43,5 +44,16 @@ public class UserAccountCommandServiceImpl implements UserAccountCommandService 
         var saved = userAccountRepository.save(userAccount);
         log.info("UserAccount created with id={}", saved.getId());
         return Optional.of(saved);
+    }
+
+    @Override
+    @Transactional
+    public Optional<UserAccount> verify(VerifyAccountCommand command) {
+        var userOpt = userAccountRepository.findByEmail(command.email());
+        if (userOpt.isEmpty()) return Optional.empty();
+        var user = userOpt.get();
+        if (!user.getVerificationCode().equals(command.code())) return Optional.empty();
+        var activated = user.activate();
+        return Optional.of(userAccountRepository.save(activated));
     }
 }

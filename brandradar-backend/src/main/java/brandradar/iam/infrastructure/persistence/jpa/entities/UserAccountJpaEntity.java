@@ -35,6 +35,20 @@ public class UserAccountJpaEntity {
     @Column(name = "USU_status", nullable = false, length = 30)
     private String status;
 
+    @Column(name = "USU_verification_code", length = 6)
+    private String verificationCode;
+
+    public UserAccountJpaEntity(Long id, String email, String passwordHash,
+                                String role, String description, String status, String verificationCode) {
+        this.id = id;
+        this.email = email;
+        this.passwordHash = passwordHash;
+        this.role = role;
+        this.description = description;
+        this.status = status;
+        this.verificationCode = verificationCode;
+    }
+
     @CreatedDate
     @Column(name = "USU_created_at", nullable = false, updatable = false)
     private Instant createdAt;

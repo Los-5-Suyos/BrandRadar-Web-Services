@@ -7,6 +7,6 @@ import jakarta.validation.constraints.Pattern;
 public record RegisterUserResource(
         @NotBlank @Email String email,
         @NotBlank String password,
-        @NotBlank @Pattern(regexp = "ADMIN|ANALYST|VIEWER") String role,
+        @NotBlank @Pattern(regexp = "ADMIN|ANALYST|VIEWER|PYME|AGENCIA") String role,
         String description
 ) {}

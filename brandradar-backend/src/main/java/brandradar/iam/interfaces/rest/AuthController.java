@@ -1,6 +1,7 @@
 package brandradar.iam.interfaces.rest;
 
 import brandradar.iam.application.commands.CreateUserAccountCommand;
+import brandradar.iam.application.commands.VerifyAccountCommand;
 import brandradar.iam.application.commandservices.UserAccountCommandService;
 import brandradar.iam.application.queryservices.UserAccountQueryService;
 import brandradar.iam.domain.model.valueobjects.Email;
@@ -30,10 +31,7 @@ public class AuthController {
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
 
-    public AuthController(UserAccountCommandService userAccountCommandService,
-                          UserAccountQueryService userAccountQueryService,
-                          PasswordEncoder passwordEncoder,
-                          JwtTokenProvider jwtTokenProvider) {
+    public AuthController(UserAccountCommandService userAccountCommandService, UserAccountQueryService userAccountQueryService, PasswordEncoder passwordEncoder, JwtTokenProvider jwtTokenProvider) {
         this.userAccountCommandService = userAccountCommandService;
         this.userAccountQueryService = userAccountQueryService;
         this.passwordEncoder = passwordEncoder;
@@ -79,7 +77,7 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        if (!"ACTIVE".equals(user.getStatus())) {
+        if ("BLOCKED".equals(user.getStatus())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
@@ -93,5 +91,15 @@ public class AuthController {
                 user.getEmail().value(),
                 user.getRole()
         ));
+    }
+
+    @Operation(summary = "Verify account with code")
+    @PostMapping("/verify")
+    public ResponseEntity<Void> verify(@RequestParam String email, @RequestParam String code) {
+        var command = new VerifyAccountCommand(new Email(email), code);
+        var result = userAccountCommandService.verify(command);
+        return result.isPresent()
+                ? ResponseEntity.ok().build()
+                : ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 }
