@@ -28,14 +28,26 @@ public class ReputationIncidentJpaEntity {
     @Column(name = "MES_id")
     private Long mentionStreamId;
 
+    @Column(name = "CRA_id")
+    private Long crisisAlertId;
+
     @Column(name = "RIN_severity_level", nullable = false)
     private Integer severityLevel;
 
     @Column(name = "RIN_severity_label", length = 50)
     private String severityLabel;
 
+    @Column(name = "RIN_title", length = 255)
+    private String title;
+
+    @Column(name = "RIN_description", columnDefinition = "TEXT")
+    private String description;
+
     @Column(name = "RIN_status", nullable = false, length = 20)
     private String status;
+
+    @Column(name = "RIN_progress_pct")
+    private Integer progressPct;
 
     @Column(name = "RIN_assigned_to")
     private Long assignedTo;
@@ -63,16 +75,21 @@ public class ReputationIncidentJpaEntity {
     @Column(name = "RIN_updated_at", nullable = false)
     private Instant updatedAt;
 
-    public ReputationIncidentJpaEntity(Long id, Long brandId, Long mentionStreamId,
-                                       Integer severityLevel, String severityLabel, String status,
-                                       Long assignedTo, BigDecimal impactScore, String resolutionSummary,
-                                       String resolutionActions, Long resolvedBy, Instant resolvedAt) {
+    public ReputationIncidentJpaEntity(Long id, Long brandId, Long mentionStreamId, Long crisisAlertId,
+                                       Integer severityLevel, String severityLabel, String title, String description,
+                                       String status, Integer progressPct, Long assignedTo, BigDecimal impactScore,
+                                       String resolutionSummary, String resolutionActions, Long resolvedBy,
+                                       Instant resolvedAt) {
         this.id = id;
         this.brandId = brandId;
         this.mentionStreamId = mentionStreamId;
+        this.crisisAlertId = crisisAlertId;
         this.severityLevel = severityLevel;
         this.severityLabel = severityLabel;
+        this.title = title;
+        this.description = description;
         this.status = status;
+        this.progressPct = progressPct;
         this.assignedTo = assignedTo;
         this.impactScore = impactScore;
         this.resolutionSummary = resolutionSummary;

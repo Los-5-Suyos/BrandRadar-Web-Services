@@ -6,6 +6,7 @@ import brandradar.reputationmonitoring.application.queryservices.MentionStreamQu
 import brandradar.reputationmonitoring.interfaces.rest.resources.CreateMentionStreamResource;
 import brandradar.reputationmonitoring.interfaces.rest.resources.MentionStreamResource;
 import brandradar.reputationmonitoring.interfaces.rest.transform.MentionStreamAssembler;
+import brandradar.shared.infrastructure.security.OwnershipGuard;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -24,17 +25,21 @@ public class MentionStreamsController {
 
     private final MentionStreamCommandService commandService;
     private final MentionStreamQueryService queryService;
+    private final OwnershipGuard ownershipGuard;
 
     public MentionStreamsController(MentionStreamCommandService commandService,
-                                    MentionStreamQueryService queryService) {
+                                    MentionStreamQueryService queryService,
+                                    OwnershipGuard ownershipGuard) {
         this.commandService = commandService;
         this.queryService = queryService;
+        this.ownershipGuard = ownershipGuard;
     }
 
     @Operation(summary = "Create a mention stream")
     @PostMapping
     public ResponseEntity<MentionStreamResource> createMentionStream(
             @Valid @RequestBody CreateMentionStreamResource resource) {
+        ownershipGuard.assertBrandOwnership(resource.brandId());
         var command = MentionStreamAssembler.toCommand(resource);
         var result = commandService.handle(command);
         return result
@@ -47,6 +52,7 @@ public class MentionStreamsController {
     @GetMapping("/brand/{brandId}")
     public ResponseEntity<List<MentionStreamResource>> getMentionStreamsByBrandId(
             @PathVariable Long brandId) {
+        ownershipGuard.assertBrandOwnership(brandId);
         var streams = queryService.handle(new GetMentionStreamsByBrandIdQuery(brandId));
         var resources = streams.stream().map(MentionStreamAssembler::toResource).toList();
         return ResponseEntity.ok(resources);

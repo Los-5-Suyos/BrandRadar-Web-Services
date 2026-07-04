@@ -41,6 +41,21 @@ public class BrandWorkspace {
         return new BrandWorkspace(id, userId, name, plan, status, policyMaxBrands, policyAlertQuota, createdAt, updatedAt);
     }
 
+    /** Combina esta instancia con los campos nuevos de un PATCH — null significa "no cambiar". */
+    public BrandWorkspace withUpdates(String newName, String newPlan) {
+        return new BrandWorkspace(
+                this.id,
+                this.userId,
+                newName != null ? new WorkspaceName(newName) : this.name,
+                newPlan != null ? newPlan : this.plan,
+                this.status,
+                this.policyMaxBrands,
+                this.policyAlertQuota,
+                this.createdAt,
+                this.updatedAt
+        );
+    }
+
     public Long getId() { return id; }
     public Long getUserId() { return userId; }
     public WorkspaceName getName() { return name; }

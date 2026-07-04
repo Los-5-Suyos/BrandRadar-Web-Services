@@ -10,4 +10,5 @@ public interface CrisisAlertRepository {
     Optional<CrisisAlert> findById(Long id);
     List<CrisisAlert> findByBrandId(Long brandId);
     List<CrisisAlert> findByStatus(String status);
+    void deleteById(Long id);
 }

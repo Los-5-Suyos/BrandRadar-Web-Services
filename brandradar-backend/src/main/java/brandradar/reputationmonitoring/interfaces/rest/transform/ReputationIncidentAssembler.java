@@ -13,8 +13,11 @@ public class ReputationIncidentAssembler {
         return new CreateReputationIncidentCommand(
                 resource.brandId(),
                 resource.mentionStreamId(),
+                resource.crisisAlertId(),
                 resource.severityLevel(),
-                resource.severityLabel()
+                resource.severityLabel(),
+                resource.title(),
+                resource.description()
         );
     }
 
@@ -23,12 +26,17 @@ public class ReputationIncidentAssembler {
                 incident.getId(),
                 incident.getBrandId(),
                 incident.getMentionStreamId(),
+                incident.getCrisisAlertId(),
                 incident.getSeverityLevel(),
                 incident.getSeverityLabel(),
+                incident.getTitle(),
+                incident.getDescription(),
                 incident.getStatus(),
+                incident.getProgressPct(),
                 incident.getAssignedTo(),
                 incident.getImpactScore(),
                 incident.getResolutionSummary(),
+                incident.getResolvedAt(),
                 incident.getCreatedAt(),
                 incident.getUpdatedAt()
         );

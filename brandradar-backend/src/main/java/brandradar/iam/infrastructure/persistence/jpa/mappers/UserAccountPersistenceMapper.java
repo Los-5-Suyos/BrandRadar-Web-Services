@@ -13,9 +13,16 @@ public class UserAccountPersistenceMapper {
         return new UserAccountJpaEntity(
                 userAccount.getId(),
                 userAccount.getEmail().value(),
+                userAccount.getFullName(),
+                userAccount.getUsername(),
                 userAccount.getPasswordHash().value(),
                 userAccount.getRole(),
                 userAccount.getDescription(),
+                userAccount.getAvatarUrl(),
+                userAccount.getBio(),
+                userAccount.getLanguage(),
+                userAccount.getTimezone(),
+                userAccount.getEmailNotifications(),
                 userAccount.getStatus(),
                 userAccount.getVerificationCode()
         );
@@ -25,9 +32,16 @@ public class UserAccountPersistenceMapper {
         return UserAccount.rehydrate(
                 entity.getId(),
                 new Email(entity.getEmail()),
+                entity.getFullName(),
+                entity.getUsername(),
                 new PasswordHash(entity.getPasswordHash()),
                 entity.getRole(),
                 entity.getDescription(),
+                entity.getAvatarUrl(),
+                entity.getBio(),
+                entity.getLanguage(),
+                entity.getTimezone(),
+                entity.getEmailNotifications(),
                 entity.getStatus(),
                 entity.getVerificationCode(),
                 entity.getCreatedAt(),

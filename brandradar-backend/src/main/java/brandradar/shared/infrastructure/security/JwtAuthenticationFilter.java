@@ -29,11 +29,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         var token = getTokenFromRequest(request);
 
-        if (StringUtils.hasText(token) && jwtTokenProvider.validateToken(token)) {
+        if (StringUtils.hasText(token) && jwtTokenProvider.validateToken(token)
+                && "access".equals(jwtTokenProvider.getTypeFromToken(token))) {
             var email = jwtTokenProvider.getEmailFromToken(token);
             var role = jwtTokenProvider.getRoleFromToken(token);
+            var userId = jwtTokenProvider.getUserIdFromToken(token);
+            var principal = new AuthenticatedUser(userId, email, role);
             var authorities = List.of(new SimpleGrantedAuthority("ROLE_" + role));
-            var authentication = new UsernamePasswordAuthenticationToken(email, null, authorities);
+            var authentication = new UsernamePasswordAuthenticationToken(principal, null, authorities);
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
 

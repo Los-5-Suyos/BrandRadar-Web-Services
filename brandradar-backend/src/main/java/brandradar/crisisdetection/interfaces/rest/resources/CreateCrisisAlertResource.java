@@ -10,6 +10,8 @@ public record CreateCrisisAlertResource(
         Long monitoringRuleId,
         Integer priorityLevel,
         String priorityLabel,
+        String title,
+        String description,
         String triggerType,
         BigDecimal triggerDeviationPct,
         BigDecimal triggerConfidence

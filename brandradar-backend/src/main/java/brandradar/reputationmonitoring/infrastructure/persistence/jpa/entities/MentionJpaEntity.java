@@ -33,14 +33,17 @@ public class MentionJpaEntity {
     @Column(name = "MEN_source_platform", length = 100)
     private String sourcePlatform;
 
-    @Column(name = "MEN_source_url", length = 2000)
+    @Column(name = "MEN_source_url", length = 500)
     private String sourceUrl;
 
     @Column(name = "MEN_source_reliability", nullable = false)
     private BigDecimal sourceReliability;
 
-    @Column(name = "MEN_author", length = 255)
+    @Column(name = "MEN_author_name", length = 255)
     private String author;
+
+    @Column(name = "MEN_author_handle", length = 255)
+    private String authorHandle;
 
     @Column(name = "MEN_published_at")
     private Instant publishedAt;
@@ -63,16 +66,29 @@ public class MentionJpaEntity {
     @Column(name = "MEN_sentiment_confidence", nullable = false)
     private BigDecimal sentimentConfidence;
 
+    @Column(name = "MEN_engagement_likes")
+    private Integer engagementLikes;
+
+    @Column(name = "MEN_engagement_comments")
+    private Integer engagementComments;
+
+    @Column(name = "MEN_engagement_views")
+    private Integer engagementViews;
+
+    @Column(name = "MEN_status", nullable = false, length = 20)
+    private String status;
+
     @CreatedDate
     @Column(name = "MEN_created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
     public MentionJpaEntity(Long id, Long mentionStreamId, Long brandId, String content,
                             String sourcePlatform, String sourceUrl, BigDecimal sourceReliability,
-                            String author, Instant publishedAt, String category,
+                            String author, String authorHandle, Instant publishedAt, String category,
                             BigDecimal sentimentPositive, BigDecimal sentimentNegative,
                             BigDecimal sentimentNeutral, BigDecimal sentimentCompound,
-                            BigDecimal sentimentConfidence) {
+                            BigDecimal sentimentConfidence, Integer engagementLikes,
+                            Integer engagementComments, Integer engagementViews, String status) {
         this.id = id;
         this.mentionStreamId = mentionStreamId;
         this.brandId = brandId;
@@ -81,6 +97,7 @@ public class MentionJpaEntity {
         this.sourceUrl = sourceUrl;
         this.sourceReliability = sourceReliability;
         this.author = author;
+        this.authorHandle = authorHandle;
         this.publishedAt = publishedAt;
         this.category = category;
         this.sentimentPositive = sentimentPositive;
@@ -88,5 +105,9 @@ public class MentionJpaEntity {
         this.sentimentNeutral = sentimentNeutral;
         this.sentimentCompound = sentimentCompound;
         this.sentimentConfidence = sentimentConfidence;
+        this.engagementLikes = engagementLikes != null ? engagementLikes : 0;
+        this.engagementComments = engagementComments != null ? engagementComments : 0;
+        this.engagementViews = engagementViews != null ? engagementViews : 0;
+        this.status = status != null ? status : "PENDIENTE";
     }
 }

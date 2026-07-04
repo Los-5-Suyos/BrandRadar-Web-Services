@@ -16,6 +16,8 @@ public class CrisisAlertAssembler {
                 resource.monitoringRuleId(),
                 resource.priorityLevel(),
                 resource.priorityLabel(),
+                resource.title(),
+                resource.description(),
                 resource.triggerType(),
                 resource.triggerDeviationPct(),
                 resource.triggerConfidence()
@@ -30,6 +32,8 @@ public class CrisisAlertAssembler {
                 alert.getMonitoringRuleId(),
                 alert.getPriorityLevel(),
                 alert.getPriorityLabel(),
+                alert.getTitle(),
+                alert.getDescription(),
                 alert.getStatus(),
                 alert.getTriggerType(),
                 alert.getTriggerDeviationPct(),

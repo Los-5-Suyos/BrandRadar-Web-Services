@@ -6,12 +6,14 @@ import brandradar.crisisdetection.application.queryservices.MonitoringRuleQueryS
 import brandradar.crisisdetection.interfaces.rest.resources.CreateMonitoringRuleResource;
 import brandradar.crisisdetection.interfaces.rest.resources.MonitoringRuleResource;
 import brandradar.crisisdetection.interfaces.rest.transform.MonitoringRuleAssembler;
+import brandradar.shared.infrastructure.security.OwnershipGuard;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -24,17 +26,21 @@ public class MonitoringRulesController {
 
     private final MonitoringRuleCommandService commandService;
     private final MonitoringRuleQueryService queryService;
+    private final OwnershipGuard ownershipGuard;
 
     public MonitoringRulesController(MonitoringRuleCommandService commandService,
-                                     MonitoringRuleQueryService queryService) {
+                                     MonitoringRuleQueryService queryService,
+                                     OwnershipGuard ownershipGuard) {
         this.commandService = commandService;
         this.queryService = queryService;
+        this.ownershipGuard = ownershipGuard;
     }
 
     @Operation(summary = "Create a monitoring rule")
     @PostMapping
     public ResponseEntity<MonitoringRuleResource> createMonitoringRule(
             @Valid @RequestBody CreateMonitoringRuleResource resource) {
+        ownershipGuard.assertBrandOwnership(resource.brandId());
         var command = MonitoringRuleAssembler.toCommand(resource);
         var result = commandService.handle(command);
         return result
@@ -47,6 +53,7 @@ public class MonitoringRulesController {
     @GetMapping("/brand/{brandId}")
     public ResponseEntity<List<MonitoringRuleResource>> getMonitoringRulesByBrandId(
             @PathVariable Long brandId) {
+        ownershipGuard.assertBrandOwnership(brandId);
         var rules = queryService.handle(new GetMonitoringRulesByBrandIdQuery(brandId));
         var resources = rules.stream().map(MonitoringRuleAssembler::toResource).toList();
         return ResponseEntity.ok(resources);
@@ -55,15 +62,19 @@ public class MonitoringRulesController {
     @Operation(summary = "Get monitoring rule by ID")
     @GetMapping("/{id}")
     public ResponseEntity<MonitoringRuleResource> getMonitoringRuleById(@PathVariable Long id) {
-        return queryService.findById(id)
-                .map(MonitoringRuleAssembler::toResource)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        var rule = queryService.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Monitoring rule not found"));
+        ownershipGuard.assertBrandOwnership(rule.getBrandId());
+        return ResponseEntity.ok(MonitoringRuleAssembler.toResource(rule));
     }
 
     @Operation(summary = "Delete monitoring rule by ID")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteMonitoringRule(@PathVariable Long id) {
+        var rule = queryService.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Monitoring rule not found"));
+        ownershipGuard.assertBrandOwnership(rule.getBrandId());
+        commandService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
 }

@@ -11,4 +11,5 @@ public interface MentionRepository {
     List<Mention> findByBrandId(Long brandId);
     List<Mention> findByMentionStreamId(Long mentionStreamId);
     boolean existsBySourceUrl(String sourceUrl);
+    void deleteById(Long id);
 }

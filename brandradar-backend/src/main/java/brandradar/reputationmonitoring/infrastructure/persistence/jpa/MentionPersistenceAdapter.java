@@ -51,4 +51,9 @@ public class MentionPersistenceAdapter implements MentionRepository {
     public boolean existsBySourceUrl(String sourceUrl) {
         return springDataRepository.existsBySourceUrl(sourceUrl);
     }
+
+    @Override
+    public void deleteById(Long id) {
+        springDataRepository.deleteById(id);
+    }
 }

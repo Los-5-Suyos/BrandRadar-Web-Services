@@ -30,6 +30,7 @@ public class MentionAssembler {
                 mention.getSourceUrl(),
                 mention.getSourceReliability(),
                 mention.getAuthor(),
+                mention.getAuthorHandle(),
                 mention.getPublishedAt(),
                 mention.getCategory(),
                 mention.getSentimentPositive(),
@@ -37,6 +38,10 @@ public class MentionAssembler {
                 mention.getSentimentNeutral(),
                 mention.getSentimentCompound(),
                 mention.getSentimentConfidence(),
+                mention.getEngagementLikes(),
+                mention.getEngagementComments(),
+                mention.getEngagementViews(),
+                mention.getStatus(),
                 mention.getCreatedAt()
         );
     }

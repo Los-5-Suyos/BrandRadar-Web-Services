@@ -30,4 +30,11 @@ public class MonitoringRuleCommandServiceImpl implements MonitoringRuleCommandSe
         log.info("MonitoringRule created with id={}", saved.getId());
         return Optional.of(saved);
     }
+
+    @Override
+    @Transactional
+    public void deleteById(Long id) {
+        monitoringRuleRepository.deleteById(id);
+        log.info("MonitoringRule deleted with id={}", id);
+    }
 }

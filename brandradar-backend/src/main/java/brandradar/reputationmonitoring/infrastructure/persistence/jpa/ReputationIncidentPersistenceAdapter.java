@@ -46,4 +46,9 @@ public class ReputationIncidentPersistenceAdapter implements ReputationIncidentR
                 .map(ReputationIncidentPersistenceMapper::toDomain)
                 .toList();
     }
+
+    @Override
+    public void deleteById(Long id) {
+        springDataRepository.deleteById(id);
+    }
 }

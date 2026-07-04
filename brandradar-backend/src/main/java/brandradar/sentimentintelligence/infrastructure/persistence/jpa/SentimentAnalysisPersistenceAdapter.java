@@ -38,4 +38,9 @@ public class SentimentAnalysisPersistenceAdapter implements SentimentAnalysisRep
                 .map(SentimentAnalysisPersistenceMapper::toDomain)
                 .toList();
     }
+
+    @Override
+    public void deleteById(Long id) {
+        springDataRepository.deleteById(id);
+    }
 }

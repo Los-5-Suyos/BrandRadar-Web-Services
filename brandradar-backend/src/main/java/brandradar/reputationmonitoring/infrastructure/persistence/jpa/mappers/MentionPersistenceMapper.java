@@ -17,13 +17,18 @@ public class MentionPersistenceMapper {
                 mention.getSourceUrl(),
                 mention.getSourceReliability(),
                 mention.getAuthor(),
+                mention.getAuthorHandle(),
                 mention.getPublishedAt(),
                 mention.getCategory(),
                 mention.getSentimentPositive(),
                 mention.getSentimentNegative(),
                 mention.getSentimentNeutral(),
                 mention.getSentimentCompound(),
-                mention.getSentimentConfidence()
+                mention.getSentimentConfidence(),
+                mention.getEngagementLikes(),
+                mention.getEngagementComments(),
+                mention.getEngagementViews(),
+                mention.getStatus()
         );
     }
 
@@ -37,6 +42,7 @@ public class MentionPersistenceMapper {
                 entity.getSourceUrl(),
                 entity.getSourceReliability(),
                 entity.getAuthor(),
+                entity.getAuthorHandle(),
                 entity.getPublishedAt(),
                 entity.getCategory(),
                 entity.getSentimentPositive(),
@@ -44,6 +50,10 @@ public class MentionPersistenceMapper {
                 entity.getSentimentNeutral(),
                 entity.getSentimentCompound(),
                 entity.getSentimentConfidence(),
+                entity.getEngagementLikes(),
+                entity.getEngagementComments(),
+                entity.getEngagementViews(),
+                entity.getStatus(),
                 entity.getCreatedAt()
         );
     }

@@ -25,7 +25,8 @@ public class CrisisAlertCommandServiceImpl implements CrisisAlertCommandService 
     public Optional<CrisisAlert> handle(CreateCrisisAlertCommand command) {
         var alert = CrisisAlert.create(command.brandId(), command.mentionStreamId(),
                 command.monitoringRuleId(), command.priorityLevel(), command.priorityLabel(),
-                command.triggerType(), command.triggerDeviationPct(), command.triggerConfidence());
+                command.title(), command.description(), command.triggerType(),
+                command.triggerDeviationPct(), command.triggerConfidence());
         var saved = crisisAlertRepository.save(alert);
         log.info("CrisisAlert created with id={}", saved.getId());
         return Optional.of(saved);

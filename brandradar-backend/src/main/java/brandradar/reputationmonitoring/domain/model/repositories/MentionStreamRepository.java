@@ -9,4 +9,5 @@ public interface MentionStreamRepository {
     MentionStream save(MentionStream mentionStream);
     Optional<MentionStream> findById(Long id);
     List<MentionStream> findByBrandId(Long brandId);
+    void deleteById(Long id);
 }

@@ -6,6 +6,7 @@ import brandradar.brandworkspace.application.queries.GetChannelsByWorkspaceIdQue
 import brandradar.brandworkspace.application.queryservices.WorkspaceChannelQueryService;
 import brandradar.brandworkspace.interfaces.rest.resources.AddWorkspaceChannelResource;
 import brandradar.brandworkspace.interfaces.rest.resources.WorkspaceChannelResource;
+import brandradar.shared.infrastructure.security.OwnershipGuard;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -24,16 +25,20 @@ public class WorkspaceChannelsController {
 
     private final WorkspaceChannelCommandService commandService;
     private final WorkspaceChannelQueryService queryService;
+    private final OwnershipGuard ownershipGuard;
 
     public WorkspaceChannelsController(WorkspaceChannelCommandService commandService,
-                                       WorkspaceChannelQueryService queryService) {
+                                       WorkspaceChannelQueryService queryService,
+                                       OwnershipGuard ownershipGuard) {
         this.commandService = commandService;
         this.queryService = queryService;
+        this.ownershipGuard = ownershipGuard;
     }
 
     @Operation(summary = "List channels for a workspace")
     @GetMapping
     public ResponseEntity<List<WorkspaceChannelResource>> getChannels(@PathVariable Long workspaceId) {
+        ownershipGuard.assertWorkspaceOwnership(workspaceId);
         var channels = queryService.handle(new GetChannelsByWorkspaceIdQuery(workspaceId));
         var resources = channels.stream()
                 .map(c -> new WorkspaceChannelResource(c.getId(), c.getWorkspaceId(), c.getChannelType()))
@@ -46,6 +51,7 @@ public class WorkspaceChannelsController {
     public ResponseEntity<WorkspaceChannelResource> addChannel(
             @PathVariable Long workspaceId,
             @Valid @RequestBody AddWorkspaceChannelResource resource) {
+        ownershipGuard.assertWorkspaceOwnership(workspaceId);
         var command = new AddWorkspaceChannelCommand(workspaceId, resource.channelType());
         var result = commandService.handle(command);
         return result
@@ -59,6 +65,7 @@ public class WorkspaceChannelsController {
     public ResponseEntity<Void> deleteChannel(
             @PathVariable Long workspaceId,
             @PathVariable String channelType) {
+        ownershipGuard.assertWorkspaceOwnership(workspaceId);
         commandService.deleteByWorkspaceIdAndChannelType(workspaceId, channelType);
         return ResponseEntity.noContent().build();
     }

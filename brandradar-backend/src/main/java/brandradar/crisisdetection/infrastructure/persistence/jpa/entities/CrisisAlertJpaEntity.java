@@ -35,6 +35,12 @@ public class CrisisAlertJpaEntity {
     @Column(name = "CRA_priority_label", length = 50)
     private String priorityLabel;
 
+    @Column(name = "CRA_title", length = 255)
+    private String title;
+
+    @Column(name = "CRA_description", columnDefinition = "TEXT")
+    private String description;
+
     @Column(name = "CRA_status", nullable = false, length = 20)
     private String status;
 
@@ -59,13 +65,19 @@ public class CrisisAlertJpaEntity {
     @Column(name = "CRA_response_time_minutes")
     private Integer responseTimeMinutes;
 
-    public CrisisAlertJpaEntity(Long id, Long brandId, Long mentionStreamId, Long monitoringRuleId, Integer priorityLevel, String priorityLabel, String status, String triggerType, BigDecimal triggerDeviationPct, BigDecimal triggerConfidence, Instant detectedAt, Instant acknowledgedAt, String dismissedReason, Integer responseTimeMinutes) {
+    public CrisisAlertJpaEntity(Long id, Long brandId, Long mentionStreamId, Long monitoringRuleId,
+                                Integer priorityLevel, String priorityLabel, String title, String description,
+                                String status, String triggerType, BigDecimal triggerDeviationPct,
+                                BigDecimal triggerConfidence, Instant detectedAt, Instant acknowledgedAt,
+                                String dismissedReason, Integer responseTimeMinutes) {
         this.id = id;
         this.brandId = brandId;
         this.mentionStreamId = mentionStreamId;
         this.monitoringRuleId = monitoringRuleId;
         this.priorityLevel = priorityLevel;
         this.priorityLabel = priorityLabel;
+        this.title = title;
+        this.description = description;
         this.status = status;
         this.triggerType = triggerType;
         this.triggerDeviationPct = triggerDeviationPct;

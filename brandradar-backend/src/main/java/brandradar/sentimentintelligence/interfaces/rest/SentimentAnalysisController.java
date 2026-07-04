@@ -6,12 +6,14 @@ import brandradar.sentimentintelligence.application.queryservices.SentimentAnaly
 import brandradar.sentimentintelligence.interfaces.rest.resources.CreateSentimentAnalysisResource;
 import brandradar.sentimentintelligence.interfaces.rest.resources.SentimentAnalysisResource;
 import brandradar.sentimentintelligence.interfaces.rest.transform.SentimentAnalysisAssembler;
+import brandradar.shared.infrastructure.security.OwnershipGuard;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -24,17 +26,21 @@ public class SentimentAnalysisController {
 
     private final SentimentAnalysisCommandService commandService;
     private final SentimentAnalysisQueryService queryService;
+    private final OwnershipGuard ownershipGuard;
 
     public SentimentAnalysisController(SentimentAnalysisCommandService commandService,
-                                       SentimentAnalysisQueryService queryService) {
+                                       SentimentAnalysisQueryService queryService,
+                                       OwnershipGuard ownershipGuard) {
         this.commandService = commandService;
         this.queryService = queryService;
+        this.ownershipGuard = ownershipGuard;
     }
 
     @Operation(summary = "Create a sentiment analysis")
     @PostMapping
     public ResponseEntity<SentimentAnalysisResource> createSentimentAnalysis(
             @Valid @RequestBody CreateSentimentAnalysisResource resource) {
+        ownershipGuard.assertBrandOwnership(resource.brandId());
         var command = SentimentAnalysisAssembler.toCommand(resource);
         var result = commandService.handle(command);
         return result
@@ -47,6 +53,7 @@ public class SentimentAnalysisController {
     @GetMapping("/brand/{brandId}")
     public ResponseEntity<List<SentimentAnalysisResource>> getSentimentAnalysisByBrandId(
             @PathVariable Long brandId) {
+        ownershipGuard.assertBrandOwnership(brandId);
         var analyses = queryService.handle(new GetSentimentAnalysisByBrandIdQuery(brandId));
         var resources = analyses.stream().map(SentimentAnalysisAssembler::toResource).toList();
         return ResponseEntity.ok(resources);
@@ -55,9 +62,9 @@ public class SentimentAnalysisController {
     @Operation(summary = "Get sentiment analysis by ID")
     @GetMapping("/{id}")
     public ResponseEntity<SentimentAnalysisResource> getSentimentAnalysisById(@PathVariable Long id) {
-        return queryService.findById(id)
-                .map(SentimentAnalysisAssembler::toResource)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        var analysis = queryService.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Sentiment analysis not found"));
+        ownershipGuard.assertBrandOwnership(analysis.getBrandId());
+        return ResponseEntity.ok(SentimentAnalysisAssembler.toResource(analysis));
     }
 }

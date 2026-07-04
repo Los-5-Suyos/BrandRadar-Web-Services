@@ -1,6 +1,9 @@
 package brandradar.reputationmonitoring.infrastructure.providers;
 
+import brandradar.brandworkspace.infrastructure.persistence.jpa.entities.KeywordRuleJpaEntity;
+import brandradar.brandworkspace.infrastructure.persistence.jpa.repositories.SpringDataKeywordRuleRepository;
 import brandradar.reputationmonitoring.domain.model.aggregates.Mention;
+import brandradar.reputationmonitoring.domain.model.services.ChannelMentionProvider;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -16,10 +19,16 @@ import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
-public class YouTubeProvider {
+public class YouTubeProvider implements ChannelMentionProvider {
+
+    @Override
+    public String getChannelType() {
+        return "YOUTUBE";
+    }
 
     @Value("${youtube.api.key}")
     private String apiKey;
@@ -29,13 +38,21 @@ public class YouTubeProvider {
 
     private final HttpClient httpClient = HttpClient.newHttpClient();
     private final ObjectMapper objectMapper = new ObjectMapper();
+    private final SpringDataKeywordRuleRepository keywordRuleRepository;
 
+    public YouTubeProvider(SpringDataKeywordRuleRepository keywordRuleRepository) {
+        this.keywordRuleRepository = keywordRuleRepository;
+    }
+
+    @Override
     public List<Mention> fetchMentions(Long brandId, String brandName) {
         List<Mention> mentions = new ArrayList<>();
         try {
-            // Paso 1: Buscar videos que mencionen la marca
-            List<String> videoIds = searchVideos(brandName);
-            log.info("YouTubeProvider - Found {} videos for brand={}", videoIds.size(), brandName);
+            String searchQuery = buildSearchQuery(brandId, brandName);
+
+            // Paso 1: Buscar videos que mencionen la marca o alguna de sus keywords
+            List<String> videoIds = searchVideos(searchQuery);
+            log.info("YouTubeProvider - Found {} videos for query=[{}]", videoIds.size(), searchQuery);
 
             // Paso 2: Por cada video obtener comentarios reales
             for (String videoId : videoIds) {
@@ -51,9 +68,28 @@ public class YouTubeProvider {
         return mentions;
     }
 
-    private List<String> searchVideos(String brandName) throws Exception {
+    /**
+     * Combina el nombre de la marca con sus keywords de inclusión configuradas
+     * (ej. "Netflix|streaming|serie|película|suscripción") usando el operador OR (|)
+     * que soporta el parámetro "q" de la YouTube Data API — así se encuentran también
+     * videos relevantes que no mencionen la marca literalmente por nombre.
+     */
+    private String buildSearchQuery(Long brandId, String brandName) {
+        var keywords = keywordRuleRepository.findByBrandIdAndIsActiveTrue(brandId)
+                .stream()
+                .map(KeywordRuleJpaEntity::getKeyword)
+                .filter(k -> !k.equalsIgnoreCase(brandName))
+                .collect(Collectors.toList());
+
+        if (keywords.isEmpty()) {
+            return brandName;
+        }
+        return brandName + "|" + String.join("|", keywords);
+    }
+
+    private List<String> searchVideos(String searchQuery) throws Exception {
         List<String> videoIds = new ArrayList<>();
-        String encoded = URLEncoder.encode(brandName, StandardCharsets.UTF_8);
+        String encoded = URLEncoder.encode(searchQuery, StandardCharsets.UTF_8);
         String url = apiUrl + "/search?part=snippet&q=" + encoded
                 + "&type=video&maxResults=5&relevanceLanguage=es"
                 + "&key=" + apiKey;
@@ -75,6 +111,8 @@ public class YouTubeProvider {
                     if (!videoId.isBlank()) videoIds.add(videoId);
                 }
             }
+        } else {
+            log.warn("YouTubeProvider - Search status={}", response.statusCode());
         }
         return videoIds;
     }

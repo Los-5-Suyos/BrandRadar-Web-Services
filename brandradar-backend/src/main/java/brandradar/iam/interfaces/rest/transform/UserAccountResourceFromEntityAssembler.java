@@ -11,8 +11,14 @@ public class UserAccountResourceFromEntityAssembler {
         return new UserAccountResource(
                 userAccount.getId(),
                 userAccount.getEmail().value(),
+                userAccount.getFullName(),
                 userAccount.getRole(),
                 userAccount.getDescription(),
+                userAccount.getAvatarUrl(),
+                userAccount.getBio(),
+                userAccount.getLanguage(),
+                userAccount.getTimezone(),
+                userAccount.getEmailNotifications(),
                 userAccount.getStatus(),
                 userAccount.getCreatedAt(),
                 userAccount.getUpdatedAt()

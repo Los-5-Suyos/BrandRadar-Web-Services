@@ -12,6 +12,8 @@ public class CrisisAlert {
     private final Long monitoringRuleId;
     private final Integer priorityLevel;
     private final String priorityLabel;
+    private final String title;
+    private final String description;
     private final String status;
     private final String triggerType;
     private final BigDecimal triggerDeviationPct;
@@ -22,16 +24,18 @@ public class CrisisAlert {
     private final Integer responseTimeMinutes;
 
     private CrisisAlert(Long id, Long brandId, Long mentionStreamId, Long monitoringRuleId,
-                        Integer priorityLevel, String priorityLabel, String status,
-                        String triggerType, BigDecimal triggerDeviationPct, BigDecimal triggerConfidence,
-                        Instant detectedAt, Instant acknowledgedAt, String dismissedReason,
-                        Integer responseTimeMinutes) {
+                        Integer priorityLevel, String priorityLabel, String title, String description,
+                        String status, String triggerType, BigDecimal triggerDeviationPct,
+                        BigDecimal triggerConfidence, Instant detectedAt, Instant acknowledgedAt,
+                        String dismissedReason, Integer responseTimeMinutes) {
         this.id = id;
         this.brandId = Objects.requireNonNull(brandId, "BrandId is required");
         this.mentionStreamId = mentionStreamId;
         this.monitoringRuleId = monitoringRuleId;
         this.priorityLevel = priorityLevel != null ? priorityLevel : 1;
         this.priorityLabel = priorityLabel;
+        this.title = title;
+        this.description = description;
         this.status = status != null ? status : "OPEN";
         this.triggerType = triggerType;
         this.triggerDeviationPct = triggerDeviationPct;
@@ -43,22 +47,23 @@ public class CrisisAlert {
     }
 
     public static CrisisAlert create(Long brandId, Long mentionStreamId, Long monitoringRuleId,
-                                     Integer priorityLevel, String priorityLabel, String triggerType,
+                                     Integer priorityLevel, String priorityLabel, String title,
+                                     String description, String triggerType,
                                      BigDecimal triggerDeviationPct, BigDecimal triggerConfidence) {
         return new CrisisAlert(null, brandId, mentionStreamId, monitoringRuleId, priorityLevel,
-                priorityLabel, "OPEN", triggerType, triggerDeviationPct, triggerConfidence,
-                Instant.now(), null, null, null);
+                priorityLabel, title, description, "OPEN", triggerType, triggerDeviationPct,
+                triggerConfidence, Instant.now(), null, null, null);
     }
 
     public static CrisisAlert rehydrate(Long id, Long brandId, Long mentionStreamId, Long monitoringRuleId,
-                                        Integer priorityLevel, String priorityLabel, String status,
-                                        String triggerType, BigDecimal triggerDeviationPct,
-                                        BigDecimal triggerConfidence, Instant detectedAt,
-                                        Instant acknowledgedAt, String dismissedReason,
+                                        Integer priorityLevel, String priorityLabel, String title,
+                                        String description, String status, String triggerType,
+                                        BigDecimal triggerDeviationPct, BigDecimal triggerConfidence,
+                                        Instant detectedAt, Instant acknowledgedAt, String dismissedReason,
                                         Integer responseTimeMinutes) {
         return new CrisisAlert(id, brandId, mentionStreamId, monitoringRuleId, priorityLevel,
-                priorityLabel, status, triggerType, triggerDeviationPct, triggerConfidence,
-                detectedAt, acknowledgedAt, dismissedReason, responseTimeMinutes);
+                priorityLabel, title, description, status, triggerType, triggerDeviationPct,
+                triggerConfidence, detectedAt, acknowledgedAt, dismissedReason, responseTimeMinutes);
     }
 
     public Long getId() { return id; }
@@ -67,6 +72,8 @@ public class CrisisAlert {
     public Long getMonitoringRuleId() { return monitoringRuleId; }
     public Integer getPriorityLevel() { return priorityLevel; }
     public String getPriorityLabel() { return priorityLabel; }
+    public String getTitle() { return title; }
+    public String getDescription() { return description; }
     public String getStatus() { return status; }
     public String getTriggerType() { return triggerType; }
     public BigDecimal getTriggerDeviationPct() { return triggerDeviationPct; }

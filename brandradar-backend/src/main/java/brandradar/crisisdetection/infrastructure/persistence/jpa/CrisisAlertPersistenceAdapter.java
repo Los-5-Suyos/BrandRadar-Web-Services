@@ -46,4 +46,9 @@ public class CrisisAlertPersistenceAdapter implements CrisisAlertRepository {
                 .map(CrisisAlertPersistenceMapper::toDomain)
                 .toList();
     }
+
+    @Override
+    public void deleteById(Long id) {
+        springDataRepository.deleteById(id);
+    }
 }

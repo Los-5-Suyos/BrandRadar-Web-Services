@@ -26,13 +26,18 @@ public class GroqApiClient {
     private final HttpClient httpClient = HttpClient.newHttpClient();
     private final ObjectMapper objectMapper = new ObjectMapper();
 
+    private static final String DEFAULT_SYSTEM_PROMPT =
+            "Eres un experto en gestión de reputación de marcas. Analiza crisis de reputación y responde " +
+                    "SIEMPRE en JSON válido con estos campos: pattern, keywords, geofocus, diagnostico, accion.";
+
     public String chat(String userMessage) {
+        return chat(DEFAULT_SYSTEM_PROMPT, userMessage);
+    }
+
+    public String chat(String systemPrompt, String userMessage) {
         try {
-            var escapedMessage = userMessage
-                    .replace("\\", "\\\\")
-                    .replace("\"", "\\\"")
-                    .replace("\n", "\\n")
-                    .replace("\r", "\\r");
+            var escapedSystem = escapeJson(systemPrompt);
+            var escapedMessage = escapeJson(userMessage);
 
             var requestBody = String.format("""
                 {
@@ -40,7 +45,7 @@ public class GroqApiClient {
                     "messages": [
                         {
                             "role": "system",
-                            "content": "Eres un experto en gestión de reputación de marcas. Analiza crisis de reputación y responde SIEMPRE en JSON válido con estos campos: pattern, keywords, geofocus, diagnostico, accion."
+                            "content": "%s"
                         },
                         {
                             "role": "user",
@@ -50,7 +55,7 @@ public class GroqApiClient {
                     "temperature": 0.3,
                     "max_tokens": 1000
                 }
-                """, model, escapedMessage);
+                """, model, escapedSystem, escapedMessage);
 
             var request = HttpRequest.newBuilder()
                     .uri(URI.create(apiUrl))
@@ -79,5 +84,13 @@ public class GroqApiClient {
             log.error("Error calling Groq API: {}", e.getMessage());
             throw new RuntimeException("Error calling Groq API", e);
         }
+    }
+
+    private String escapeJson(String text) {
+        return text
+                .replace("\\", "\\\\")
+                .replace("\"", "\\\"")
+                .replace("\n", "\\n")
+                .replace("\r", "\\r");
     }
 }

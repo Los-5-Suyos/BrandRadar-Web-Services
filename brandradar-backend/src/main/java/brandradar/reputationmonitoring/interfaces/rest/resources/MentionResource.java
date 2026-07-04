@@ -12,6 +12,7 @@ public record MentionResource(
         String sourceUrl,
         BigDecimal sourceReliability,
         String author,
+        String authorHandle,
         Instant publishedAt,
         String category,
         BigDecimal sentimentPositive,
@@ -19,5 +20,9 @@ public record MentionResource(
         BigDecimal sentimentNeutral,
         BigDecimal sentimentCompound,
         BigDecimal sentimentConfidence,
+        Integer engagementLikes,
+        Integer engagementComments,
+        Integer engagementViews,
+        String status,
         Instant createdAt
 ) {}

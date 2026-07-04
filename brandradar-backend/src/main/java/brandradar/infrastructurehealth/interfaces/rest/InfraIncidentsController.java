@@ -6,12 +6,14 @@ import brandradar.infrastructurehealth.application.queryservices.InfraIncidentQu
 import brandradar.infrastructurehealth.interfaces.rest.resources.CreateInfraIncidentResource;
 import brandradar.infrastructurehealth.interfaces.rest.resources.InfraIncidentResource;
 import brandradar.infrastructurehealth.interfaces.rest.transform.InfraIncidentAssembler;
+import brandradar.shared.infrastructure.security.CurrentUser;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -19,21 +21,28 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
 @RequestMapping(value = "/api/v1/infra-incidents", produces = APPLICATION_JSON_VALUE)
-@Tag(name = "Infrastructure Incidents", description = "Infrastructure Incident management endpoints")
+@Tag(name = "Infrastructure Incidents", description = "Infrastructure Incident management endpoints " +
+        "(ADMIN only — incidentes técnicos del sistema, distintos a los ReputationIncident/CrisisAlert " +
+        "de una marca)")
 public class InfraIncidentsController {
 
     private final InfraIncidentCommandService commandService;
     private final InfraIncidentQueryService queryService;
+    private final CurrentUser currentUser;
 
-    public InfraIncidentsController(InfraIncidentCommandService commandService, InfraIncidentQueryService queryService) {
+    public InfraIncidentsController(InfraIncidentCommandService commandService,
+                                    InfraIncidentQueryService queryService,
+                                    CurrentUser currentUser) {
         this.commandService = commandService;
         this.queryService = queryService;
+        this.currentUser = currentUser;
     }
 
-    @Operation(summary = "Create an infrastructure incident")
+    @Operation(summary = "Create an infrastructure incident (ADMIN only)")
     @PostMapping
     public ResponseEntity<InfraIncidentResource> createInfraIncident(
             @Valid @RequestBody CreateInfraIncidentResource resource) {
+        assertAdmin();
         var command = InfraIncidentAssembler.toCommand(resource);
         var result = commandService.handle(command);
         return result
@@ -42,21 +51,29 @@ public class InfraIncidentsController {
                 .orElse(ResponseEntity.badRequest().build());
     }
 
-    @Operation(summary = "Get infrastructure incidents by status")
+    @Operation(summary = "Get infrastructure incidents by status (ADMIN only)")
     @GetMapping("/status/{status}")
     public ResponseEntity<List<InfraIncidentResource>> getInfraIncidentsByStatus(
             @PathVariable String status) {
+        assertAdmin();
         var incidents = queryService.handle(new GetInfraIncidentsByStatusQuery(status));
         var resources = incidents.stream().map(InfraIncidentAssembler::toResource).toList();
         return ResponseEntity.ok(resources);
     }
 
-    @Operation(summary = "Get infrastructure incident by ID")
+    @Operation(summary = "Get infrastructure incident by ID (ADMIN only)")
     @GetMapping("/{id}")
     public ResponseEntity<InfraIncidentResource> getInfraIncidentById(@PathVariable Long id) {
+        assertAdmin();
         return queryService.findById(id)
                 .map(InfraIncidentAssembler::toResource)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    private void assertAdmin() {
+        if (!"ADMIN".equals(currentUser.get().role())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Admin access required");
+        }
     }
 }

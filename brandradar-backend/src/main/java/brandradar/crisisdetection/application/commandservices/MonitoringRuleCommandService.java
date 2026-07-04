@@ -7,4 +7,5 @@ import java.util.Optional;
 
 public interface MonitoringRuleCommandService {
     Optional<MonitoringRule> handle(CreateMonitoringRuleCommand command);
+    void deleteById(Long id);
 }

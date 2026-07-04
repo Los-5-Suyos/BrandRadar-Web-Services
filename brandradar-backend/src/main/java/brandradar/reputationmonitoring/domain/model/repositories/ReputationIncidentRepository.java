@@ -10,4 +10,5 @@ public interface ReputationIncidentRepository {
     Optional<ReputationIncident> findById(Long id);
     List<ReputationIncident> findByBrandId(Long brandId);
     List<ReputationIncident> findByStatus(String status);
+    void deleteById(Long id);
 }

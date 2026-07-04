@@ -24,9 +24,18 @@ public class ReputationIncidentCommandServiceImpl implements ReputationIncidentC
     @Transactional
     public Optional<ReputationIncident> handle(CreateReputationIncidentCommand command) {
         var incident = ReputationIncident.create(command.brandId(), command.mentionStreamId(),
-                command.severityLevel(), command.severityLabel());
+                command.crisisAlertId(), command.severityLevel(), command.severityLabel(),
+                command.title(), command.description());
         var saved = reputationIncidentRepository.save(incident);
         log.info("ReputationIncident created with id={}", saved.getId());
         return Optional.of(saved);
+    }
+
+    @Override
+    @Transactional
+    public ReputationIncident updateStatus(ReputationIncident incident) {
+        var saved = reputationIncidentRepository.save(incident);
+        log.info("ReputationIncident status updated for id={} to status={}", saved.getId(), saved.getStatus());
+        return saved;
     }
 }

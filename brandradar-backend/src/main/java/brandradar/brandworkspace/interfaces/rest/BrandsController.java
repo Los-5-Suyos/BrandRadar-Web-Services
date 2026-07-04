@@ -7,6 +7,7 @@ import brandradar.brandworkspace.interfaces.rest.resources.BrandResource;
 import brandradar.brandworkspace.interfaces.rest.resources.CreateBrandResource;
 import brandradar.brandworkspace.interfaces.rest.transform.BrandResourceFromEntityAssembler;
 import brandradar.brandworkspace.interfaces.rest.transform.CreateBrandCommandFromResourceAssembler;
+import brandradar.shared.infrastructure.security.OwnershipGuard;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -25,15 +26,19 @@ public class BrandsController {
 
     private final BrandCommandService commandService;
     private final BrandQueryService queryService;
+    private final OwnershipGuard ownershipGuard;
 
-    public BrandsController(BrandCommandService commandService, BrandQueryService queryService) {
+    public BrandsController(BrandCommandService commandService, BrandQueryService queryService,
+                            OwnershipGuard ownershipGuard) {
         this.commandService = commandService;
         this.queryService = queryService;
+        this.ownershipGuard = ownershipGuard;
     }
 
     @Operation(summary = "Create a new brand")
     @PostMapping
     public ResponseEntity<BrandResource> createBrand(@Valid @RequestBody CreateBrandResource resource) {
+        ownershipGuard.assertWorkspaceOwnership(resource.workspaceId());
         var command = CreateBrandCommandFromResourceAssembler.toCommand(resource);
         var result = commandService.handle(command);
         return result
@@ -45,6 +50,7 @@ public class BrandsController {
     @Operation(summary = "Get brands by workspace ID")
     @GetMapping("/workspace/{workspaceId}")
     public ResponseEntity<List<BrandResource>> getBrandsByWorkspaceId(@PathVariable Long workspaceId) {
+        ownershipGuard.assertWorkspaceOwnership(workspaceId);
         var brands = queryService.handle(new GetBrandsByWorkspaceIdQuery(workspaceId));
         var resources = brands.stream()
                 .map(BrandResourceFromEntityAssembler::toResourceFromEntity)
@@ -55,6 +61,7 @@ public class BrandsController {
     @Operation(summary = "Get brand by ID")
     @GetMapping("/{id}")
     public ResponseEntity<BrandResource> getBrandById(@PathVariable Long id) {
-        return ResponseEntity.notFound().build();
+        var brand = ownershipGuard.assertBrandOwnership(id);
+        return ResponseEntity.ok(BrandResourceFromEntityAssembler.toResourceFromEntity(brand));
     }
 }

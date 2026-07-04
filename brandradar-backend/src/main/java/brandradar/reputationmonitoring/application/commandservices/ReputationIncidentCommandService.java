@@ -7,4 +7,5 @@ import java.util.Optional;
 
 public interface ReputationIncidentCommandService {
     Optional<ReputationIncident> handle(CreateReputationIncidentCommand command);
+    ReputationIncident updateStatus(ReputationIncident incident);
 }
