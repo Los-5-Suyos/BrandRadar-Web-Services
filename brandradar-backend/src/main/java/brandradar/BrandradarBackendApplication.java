@@ -9,6 +9,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 public class BrandradarBackendApplication {
 
     public static void main(String[] args) {
+
         SpringApplication.run(BrandradarBackendApplication.class, args);
     }
 }
