@@ -7,11 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-/**
- * Las 5 preferencias configurables (backlog 3.5): caída de score, spike negativo,
- * keyword crítica, nuevo incidente, volumen alto. Si un brand nunca las configuró,
- * se devuelven todas en "true" por default (comportamiento actual, sin sorpresas).
- */
+
 @Service
 public class AlertPreferenceService {
 

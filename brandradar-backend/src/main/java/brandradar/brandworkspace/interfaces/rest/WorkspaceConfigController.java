@@ -4,7 +4,7 @@ import brandradar.brandworkspace.application.commands.UpdateWorkspaceConfigComma
 import brandradar.brandworkspace.application.commandservices.WorkspaceConfigCommandService;
 import brandradar.brandworkspace.application.queries.GetWorkspaceConfigByWorkspaceIdQuery;
 import brandradar.brandworkspace.application.queryservices.WorkspaceConfigQueryService;
-import brandradar.brandworkspace.infrastructure.storage.LogoStorageService;
+import brandradar.brandworkspace.infrastructure.persistence.jpa.storage.LogoStorageService;
 import brandradar.brandworkspace.interfaces.rest.resources.UpdateWorkspaceConfigResource;
 import brandradar.brandworkspace.interfaces.rest.resources.WorkspaceConfigResource;
 import brandradar.brandworkspace.interfaces.rest.transform.WorkspaceConfigAssembler;

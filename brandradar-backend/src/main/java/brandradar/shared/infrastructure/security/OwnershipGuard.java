@@ -9,10 +9,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
 /**
- * Responde: "¿este workspace/brand le pertenece al usuario que hace la petición?"
- * Cada controller que reciba un {workspaceId} o {brandId} debería llamar a uno
- * de estos métodos antes de leer/escribir nada, para evitar que un usuario
- * pueda ver o modificar datos de otro (IDOR).
  *
  * El rol ADMIN se salta esta validación (acceso de soporte/back-office).
  */

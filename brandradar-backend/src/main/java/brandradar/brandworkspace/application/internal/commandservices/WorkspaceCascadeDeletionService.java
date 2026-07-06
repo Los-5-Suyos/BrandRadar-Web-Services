@@ -1,5 +1,6 @@
 package brandradar.brandworkspace.application.internal.commandservices;
 
+import brandradar.brandworkspace.domain.model.services.ChannelPlanPolicy;
 import brandradar.brandworkspace.domain.model.repositories.BrandRepository;
 import brandradar.brandworkspace.domain.model.repositories.KeywordRuleRepository;
 import brandradar.brandworkspace.domain.model.repositories.WorkspaceChannelRepository;
@@ -14,14 +15,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * Borra un workspace y TODO lo que depende de él, en el orden correcto para no
- * romper llaves foráneas: primero lo que depende de cada Brand (mentions, incidentes,
- * alertas, reglas, análisis de sentimiento, keywords de inclusión), luego los Brands
- * en sí, luego lo que depende directo del workspace (canales, exclusion keywords),
- * y al final el workspace (lo borra BrandWorkspaceCommandServiceImpl después de llamar
- * a este servicio).
- */
 @Slf4j
 @Service
 public class WorkspaceCascadeDeletionService {

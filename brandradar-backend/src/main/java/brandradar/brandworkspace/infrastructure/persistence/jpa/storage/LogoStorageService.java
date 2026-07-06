@@ -1,4 +1,4 @@
-package brandradar.brandworkspace.infrastructure.storage;
+package brandradar.brandworkspace.infrastructure.persistence.jpa.storage;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
