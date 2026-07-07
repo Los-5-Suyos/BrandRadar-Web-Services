@@ -103,7 +103,7 @@ public class UserAccountController {
         assertSelfOrAdmin(id);
         var avatarUrl = avatarStorageService.store(file, id);
 
-        var command = new UpdateUserProfileCommand(id, null, null, null, null, null, avatarUrl);
+        var command = new UpdateUserProfileCommand(id, null, null, null, null, null, null, avatarUrl);
         var updated = userAccountCommandService.handle(command);
         return ResponseEntity.ok(UserAccountResourceFromEntityAssembler.toResourceFromEntity(updated));
     }
