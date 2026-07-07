@@ -67,11 +67,12 @@ public class UserAccount {
                 this.emailNotifications, "ACTIVE", this.verificationCode, this.createdAt, this.updatedAt);
     }
 
-    /** Combina esta cuenta con los campos nuevos de un PATCH de perfil — null = no cambiar. */
-    public UserAccount withProfileUpdates(String fullName, String bio, String language,
+
+    public UserAccount withProfileUpdates(String fullName, String username, String bio, String language,
                                           String timezone, Boolean emailNotifications, String avatarUrl) {
         return new UserAccount(this.id, this.email, fullName != null ? fullName : this.fullName,
-                this.username, this.passwordHash, this.role, this.description,
+                username != null ? username : this.username,
+                this.passwordHash, this.role, this.description,
                 avatarUrl != null ? avatarUrl : this.avatarUrl,
                 bio != null ? bio : this.bio,
                 language != null ? language : this.language,

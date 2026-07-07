@@ -89,7 +89,7 @@ public class UserAccountController {
             @PathVariable Long id,
             @RequestBody UpdateUserProfileResource resource) {
         assertSelfOrAdmin(id);
-        var command = new UpdateUserProfileCommand(id, resource.fullName(), resource.bio(),
+        var command = new UpdateUserProfileCommand(id, resource.fullName(), resource.username(), resource.bio(),
                 resource.language(), resource.timezone(), resource.emailNotifications(), null);
         var updated = userAccountCommandService.handle(command);
         return ResponseEntity.ok(UserAccountResourceFromEntityAssembler.toResourceFromEntity(updated));

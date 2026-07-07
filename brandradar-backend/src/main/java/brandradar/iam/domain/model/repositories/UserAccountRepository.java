@@ -8,6 +8,7 @@ import java.util.Optional;
 
 public interface UserAccountRepository {
     UserAccount save(UserAccount userAccount);
+    Optional<UserAccount> findByUsername(String username);
     Optional<UserAccount> findById(Long id);
     Optional<UserAccount> findByEmail(Email email);
     boolean existsByEmail(Email email);

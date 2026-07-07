@@ -66,8 +66,15 @@ public class UserAccountCommandServiceImpl implements UserAccountCommandService 
         var user = userAccountRepository.findById(command.userId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
-        var updated = user.withProfileUpdates(command.fullName(), command.bio(), command.language(),
-                command.timezone(), command.emailNotifications(), command.avatarUrl());
+        if (command.username() != null && !command.username().equals(user.getUsername())) {
+            var existing = userAccountRepository.findByUsername(command.username());
+            if (existing.isPresent() && !existing.get().getId().equals(command.userId())) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Ese nombre de usuario ya está en uso");
+            }
+        }
+
+        var updated = user.withProfileUpdates(command.fullName(), command.username(), command.bio(),
+                command.language(), command.timezone(), command.emailNotifications(), command.avatarUrl());
         var saved = userAccountRepository.save(updated);
         log.info("UserAccount profile updated for id={}", command.userId());
         return saved;

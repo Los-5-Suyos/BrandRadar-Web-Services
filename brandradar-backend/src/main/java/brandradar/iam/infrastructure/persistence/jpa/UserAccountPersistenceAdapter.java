@@ -33,6 +33,12 @@ public class UserAccountPersistenceAdapter implements UserAccountRepository {
     }
 
     @Override
+    public Optional<UserAccount> findByUsername(String username) {
+        return springDataRepository.findByUsername(username)
+                .map(UserAccountPersistenceMapper::toDomain);
+    }
+
+    @Override
     public Optional<UserAccount> findByEmail(Email email) {
         return springDataRepository.findByEmail(email.value())
                 .map(UserAccountPersistenceMapper::toDomain);
